@@ -120,7 +120,16 @@ class PasswordForm extends FormBase {
    */
   public function validatePassword(array &$form, FormStateInterface $form_state) : void {
     $flood_config = $this->config(self::FLOOD_CONFIG_NAME);
-    if (!$this->flood->isAllowed(self::FLOOD_EVENT_IP, $flood_config->get('ip_limit'), $flood_config->get('ip_window'))) {
+    /** @var int $ip_limit */
+    $ip_limit = $flood_config->get('ip_limit');
+    /** @var int $ip_window */
+    $ip_window = $flood_config->get('ip_window');
+    /** @var int $user_limit */
+    $user_limit = $flood_config->get('user_limit');
+    /** @var int $user_window */
+    $user_window = $flood_config->get('user_window');
+
+    if (!$this->flood->isAllowed(self::FLOOD_EVENT_IP, $ip_limit, $ip_window)) {
       $form_state->set('flood_control_triggered', 'ip');
       return;
     }
@@ -128,19 +137,20 @@ class PasswordForm extends FormBase {
     $account = $this->currentUser();
     if ($account->isAuthenticated()) {
       if ($flood_config->get('uid_only')) {
-        $identifier = $account->id();
+        $identifier = (string) $account->id();
       }
       else {
         $identifier = $account->id() . '-' . $this->getRequest()->getClientIP();
       }
       $form_state->set('flood_control_user_identifier', $identifier);
 
-      if (!$this->flood->isAllowed(self::FLOOD_EVENT_USER, $flood_config->get('user_limit'), $flood_config->get('user_window'), $identifier)) {
+      if (!$this->flood->isAllowed(self::FLOOD_EVENT_USER, $user_limit, $user_window, $identifier)) {
         $form_state->set('flood_control_triggered', 'user');
         return;
       }
     }
 
+    /** @var string $password */
     $password = $form_state->getValue('form_password');
     $storage = $form_state->getStorage();
     $form_state->set('password_is_valid', $this->passwordValidator->validatePassword($password, $storage['args']['field']));
@@ -153,7 +163,15 @@ class PasswordForm extends FormBase {
    */
   public function validateFinal(array &$form, FormStateInterface $form_state) : void {
     $flood_config = $this->config(self::FLOOD_CONFIG_NAME);
+    /** @var int $ip_window */
+    $ip_window = $flood_config->get('ip_window');
+    /** @var int $user_limit */
+    $user_limit = $flood_config->get('user_limit');
+    /** @var int $user_window */
+    $user_window = $flood_config->get('user_window');
+
     $flood_control_triggered = $form_state->get('flood_control_triggered');
+    /** @var string $flood_control_user_identifier */
     $flood_control_user_identifier = $form_state->get('flood_control_user_identifier');
 
     // Invalid flood.
@@ -161,7 +179,7 @@ class PasswordForm extends FormBase {
       $message = $this->t('Too many failed attempts from your IP address. This IP address is temporarily blocked. Try again later.');
 
       if ($flood_control_triggered == 'user') {
-        $message = $this->formatPlural($flood_config->get('user_limit'), 'There has been more than one failed attempt for this account. It is temporarily blocked. Try again later.', 'There have been more than @count failed attempts for this account. It is temporarily blocked. Try again later.');
+        $message = $this->formatPlural($user_limit, 'There has been more than one failed attempt for this account. It is temporarily blocked. Try again later.', 'There have been more than @count failed attempts for this account. It is temporarily blocked. Try again later.');
       }
 
       $form_state->setError($form['form_password'], $message);
@@ -172,9 +190,9 @@ class PasswordForm extends FormBase {
       $form_state->setError($form['form_password'], $this->t('Incorrect password!'));
 
       // Register flood.
-      $this->flood->register(self::FLOOD_EVENT_IP, $flood_config->get('ip_window'));
+      $this->flood->register(self::FLOOD_EVENT_IP, $ip_window);
       if ($flood_control_user_identifier) {
-        $this->flood->register(self::FLOOD_EVENT_USER, $flood_config->get('user_window'), $flood_control_user_identifier);
+        $this->flood->register(self::FLOOD_EVENT_USER, $user_window, $flood_control_user_identifier);
       }
     }
     elseif ($flood_control_user_identifier) {

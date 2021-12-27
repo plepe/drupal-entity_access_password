@@ -148,7 +148,7 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
     ];
 
     // Allows password confirm states to depend only on the random password
-    // checkbox
+    // checkbox.
     $element['password_wrapper'] = [
       '#type' => 'container',
       '#states' => [
@@ -264,8 +264,10 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
       // Random password.
       if ($value['password_wrapper']['random_password']) {
         $global_settings = $this->configFactory->get(SettingsForm::CONFIG_NAME);
+        /** @var int $random_password_length */
+        $random_password_length = $global_settings->get('random_password_length');
         $random = new Random();
-        $random_password = $random->string($global_settings->get('random_password_length'));
+        $random_password = $random->string($random_password_length);
         $value['password'] = $this->password->hash($random_password);
 
         // This method is called during form validation and form submission.
@@ -279,10 +281,13 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
       else {
         // If no new password, re-inject saved password if existing.
         if ($password === '') {
-          $old_field = $form_state->getFormObject()
-            ->getEntity()
-            ->get($this->fieldDefinition->getName());
-          $old_password = isset($old_field) ? $old_field->get($value['_original_delta']) : NULL;
+          /** @var \Drupal\Core\Entity\EntityFormInterface $entity_form */
+          $entity_form = $form_state->getFormObject();
+          /** @var \Drupal\Core\Entity\FieldableEntityInterface $entity */
+          $entity = $entity_form->getEntity();
+          $old_field = $entity->get($this->fieldDefinition->getName());
+          $old_password = $old_field->get($value['_original_delta']);
+          // @phpstan-ignore-next-line
           $value['password'] = isset($old_password) ? $old_password->password : '';
         }
         else {

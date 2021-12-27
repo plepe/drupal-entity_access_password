@@ -96,10 +96,14 @@ class EntityAccessPasswordFormFormatter extends FormatterBase implements Contain
       return $elements;
     }
 
+    /** @var string $help_text */
+    $help_text = $this->getSetting('help_text');
+
     $elements[] = [
       '#theme' => 'entity_access_password_form',
-      '#help_text' => new FormattableMarkup(Xss::filterAdmin($this->getSetting('help_text')), []),
+      '#help_text' => new FormattableMarkup(Xss::filterAdmin($help_text), []),
       '#hint' => XSS::filter($values['hint']),
+      // @phpstan-ignore-next-line
       '#form' => $this->formBuilder->getForm(PasswordForm::class, ['field' => $itemsData]),
     ];
 

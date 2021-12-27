@@ -68,7 +68,6 @@ class PasswordValidator implements PasswordValidatorInterface {
     }
 
     // @todo password hierarchy.
-
     if ($password_is_valid) {
       $entity = $fieldItem->getEntity();
       $this->accessStorage->storeEntityAccess($entity);

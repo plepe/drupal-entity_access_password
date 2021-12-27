@@ -22,7 +22,7 @@ interface PasswordValidatorInterface {
    *
    * @param string $password
    *   The password to validate.
-   * @param \Drupal\entity_access_password\Plugin\Field\FieldType\EntityAccessPasswordItem
+   * @param \Drupal\entity_access_password\Plugin\Field\FieldType\EntityAccessPasswordItem $fieldItem
    *   The field item.
    *
    * @return bool

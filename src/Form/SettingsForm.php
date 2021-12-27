@@ -29,7 +29,7 @@ class SettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container) : self {
     $instance = parent::create($container);
     $instance->password = $container->get('password');
     return $instance;
@@ -89,6 +89,7 @@ class SettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) : void {
+    /** @var string $password */
     $password = $form_state->getValue('password');
 
     $config = $this->config('entity_access_password.settings');

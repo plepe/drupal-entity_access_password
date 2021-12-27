@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace Drupal\entity_access_password\Service;
 
+use Drupal\Core\Entity\FieldableEntityInterface;
+
 /**
  * Provides a password access checker manager.
  */
@@ -37,11 +39,16 @@ class AccessCheckerManager implements ChainAccessCheckerInterface {
   /**
    * {@inheritdoc}
    */
-//  public function storeEntityAccess(ContentEntityInterface $entity) : void {
-//    foreach ($this->getSortedCheckers() as $checker) {
-//      $checker->storeEntityAccess($entity);
-//    }
-//  }
+  public function hasUserAccessToEntity(FieldableEntityInterface $entity) : bool {
+    foreach ($this->getSortedCheckers() as $checker) {
+      // Stop on the first service granting access.
+      if ($checker->hasUserAccessToEntity($entity)) {
+        return TRUE;
+      }
+    }
+
+    return FALSE;
+  }
 
   /**
    * Returns the sorted array of checkers.

@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\entity_access_password\Service;
 
-use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 
 /**
  * Provides a password access storage manager.
@@ -39,7 +39,7 @@ class AccessStorageManager implements ChainAccessStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function storeEntityAccess(ContentEntityInterface $entity) : void {
+  public function storeEntityAccess(FieldableEntityInterface $entity) : void {
     foreach ($this->getSortedStorages() as $storage) {
       $storage->storeEntityAccess($entity);
     }
@@ -48,7 +48,7 @@ class AccessStorageManager implements ChainAccessStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function storeEntityBundleAccess(ContentEntityInterface $entity) : void {
+  public function storeEntityBundleAccess(FieldableEntityInterface $entity) : void {
     foreach ($this->getSortedStorages() as $storage) {
       $storage->storeEntityBundleAccess($entity);
     }

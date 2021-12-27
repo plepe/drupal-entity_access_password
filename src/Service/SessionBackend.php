@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\entity_access_password\Service;
 
-use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
@@ -37,7 +37,7 @@ class SessionBackend implements AccessStorageInterface, AccessCheckerInterface {
   /**
    * {@inheritdoc}
    */
-  public function storeEntityAccess(ContentEntityInterface $entity) : void {
+  public function storeEntityAccess(FieldableEntityInterface $entity) : void {
     /** @var array $session_data */
     $session_data = $this->session->get(self::SESSION_KEY, []);
     $session_data[$entity->getEntityTypeId()][$entity->bundle()][$entity->uuid()] = $entity->uuid();
@@ -47,7 +47,8 @@ class SessionBackend implements AccessStorageInterface, AccessCheckerInterface {
   /**
    * {@inheritdoc}
    */
-  public function storeEntityBundleAccess(ContentEntityInterface $entity) : void {
+  public function storeEntityBundleAccess(FieldableEntityInterface $entity) : void {
+    /** @var array $session_data */
     $session_data = $this->session->get(self::SESSION_KEY, []);
     $session_data[$entity->getEntityTypeId()][$entity->bundle()]['bundle_access'] = TRUE;
     $this->session->set(self::SESSION_KEY, $session_data);
@@ -57,9 +58,23 @@ class SessionBackend implements AccessStorageInterface, AccessCheckerInterface {
    * {@inheritdoc}
    */
   public function storeGlobalAccess() : void {
+    /** @var array $session_data */
     $session_data = $this->session->get(self::SESSION_KEY, []);
     $session_data['global_access'] = TRUE;
     $this->session->set(self::SESSION_KEY, $session_data);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasUserAccessToEntity(FieldableEntityInterface $entity) : bool {
+    /** @var array $session_data */
+    $session_data = $this->session->get(self::SESSION_KEY, []);
+    if (isset($session_data[$entity->getEntityTypeId()][$entity->bundle()][$entity->uuid()])) {
+      return TRUE;
+    }
+
+    return FALSE;
   }
 
 }
