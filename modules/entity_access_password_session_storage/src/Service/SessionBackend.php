@@ -2,9 +2,11 @@
 
 declare(strict_types = 1);
 
-namespace Drupal\entity_access_password\Service;
+namespace Drupal\entity_access_password_session_backend\Service;
 
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\entity_access_password\Service\AccessCheckerInterface;
+use Drupal\entity_access_password\Service\AccessStorageInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
