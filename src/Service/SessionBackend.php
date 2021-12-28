@@ -68,6 +68,13 @@ class SessionBackend implements AccessStorageInterface, AccessCheckerInterface {
    * {@inheritdoc}
    */
   public function hasUserAccessToEntity(FieldableEntityInterface $entity) : bool {
+    // As there is currently no simple way to invalidate session's data
+    // depending cache without creating too many variations, set a max-age at 0.
+    // Also when there is a session cookie, the Internal Page Cache module does
+    // not store cache, so only the Dynamic Page Cache is used and only this
+    // part of the page will not be cacheable.
+    $entity->mergeCacheMaxAge(0);
+
     /** @var array $session_data */
     $session_data = $this->session->get(self::SESSION_KEY, []);
     if (isset($session_data[$entity->getEntityTypeId()][$entity->bundle()][$entity->uuid()])) {
