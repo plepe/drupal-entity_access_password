@@ -16,7 +16,7 @@ class AccessStorageManager implements ChainAccessStorageInterface {
    *
    * @var array
    */
-  protected $storages = [];
+  protected array $storages = [];
 
   /**
    * Holds the array of storages sorted by priority.

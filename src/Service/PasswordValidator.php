@@ -18,7 +18,7 @@ class PasswordValidator implements PasswordValidatorInterface {
    *
    * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
-  protected $configFactory;
+  protected ConfigFactoryInterface $configFactory;
 
   /**
    * The password hashing service object.

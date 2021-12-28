@@ -24,7 +24,7 @@ class SessionBackend implements AccessStorageInterface, AccessCheckerInterface {
    *
    * @var \Symfony\Component\HttpFoundation\Session\SessionInterface
    */
-  protected $session;
+  protected SessionInterface $session;
 
   /**
    * Constructor.

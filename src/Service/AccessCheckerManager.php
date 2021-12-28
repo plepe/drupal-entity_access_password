@@ -16,7 +16,7 @@ class AccessCheckerManager implements ChainAccessCheckerInterface {
    *
    * @var array
    */
-  protected $checkers = [];
+  protected array $checkers = [];
 
   /**
    * Holds the array of checkers sorted by priority.
