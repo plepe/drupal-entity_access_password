@@ -82,6 +82,36 @@ class EntityAccessPasswordItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
+  public function preSave() : void {
+    parent::preSave();
+
+    /** @var array $current_value */
+    $current_value = $this->getValue();
+
+    // If new password, save it.
+    if (!empty($current_value['password'])) {
+      return;
+    }
+
+    // If no new password, re-inject saved password if existing.
+    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    $entity = $this->getEntity();
+    /** @var \Drupal\Core\Entity\ContentEntityInterface $original */
+    // @phpstan-ignore-next-line
+    $original = $entity->original;
+    $field_name = $this->getFieldDefinition()->getName();
+
+    /** @var array $original_value */
+    $original_value = $original->get($field_name)->getValue();
+    if (isset($original_value[0]['password']) && !empty($original_value[0]['password'])) {
+      $current_value['password'] = $original_value[0]['password'];
+      $this->setValue($current_value);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) : array {
     $properties = [];
     $properties['is_protected'] = DataDefinition::create('boolean')
@@ -94,6 +124,13 @@ class EntityAccessPasswordItem extends FieldItemBase {
       ->setLabel(t('Password'));
 
     return $properties;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function mainPropertyName() {
+    return 'is_protected';
   }
 
   /**

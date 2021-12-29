@@ -278,21 +278,8 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
           ]));
         }
       }
-      else {
-        // If no new password, re-inject saved password if existing.
-        if ($password === '') {
-          /** @var \Drupal\Core\Entity\EntityFormInterface $entity_form */
-          $entity_form = $form_state->getFormObject();
-          /** @var \Drupal\Core\Entity\FieldableEntityInterface $entity */
-          $entity = $entity_form->getEntity();
-          $old_field = $entity->get($this->fieldDefinition->getName());
-          $old_password = $old_field->get($value['_original_delta']);
-          // @phpstan-ignore-next-line
-          $value['password'] = isset($old_password) ? $old_password->password : '';
-        }
-        else {
-          $value['password'] = $this->password->hash($password);
-        }
+      elseif (!empty($password)) {
+        $value['password'] = $this->password->hash($password);
       }
 
       // Cleanup.

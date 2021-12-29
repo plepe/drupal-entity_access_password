@@ -13,7 +13,9 @@ use Drupal\entity_access_password\Service\PasswordAccessManagerInterface;
 /**
  * Defines the EntityIsProtectedCacheContext service.
  *
- * Calculated cache context ID: 'entity_access_password_entity_is_protected:%entity_type_id||%entity_id||%view_mode', e.g. 'entity_access_password_entity_is_protected:node||42||teaser'.
+ * Calculated cache context ID:
+ * 'entity_access_password_entity_is_protected:%entity_type_id||%entity_id||%view_mode',
+ * e.g. 'entity_access_password_entity_is_protected:node||42||teaser'.
  */
 class EntityIsProtectedCacheContext implements CalculatedCacheContextInterface {
 
@@ -113,7 +115,7 @@ class EntityIsProtectedCacheContext implements CalculatedCacheContextInterface {
    * @param string $entity_info
    *   The cache context parameter.
    *
-   * @return \Drupal\Core\Entity\FieldableEntityInterface|NULL
+   * @return \Drupal\Core\Entity\FieldableEntityInterface|null
    *   The fieldable entity if found. NULL otherwise.
    */
   protected function loadEntity(string $entity_info) {
