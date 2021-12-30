@@ -39,6 +39,13 @@ class EntityIsProtectedCacheContext implements CalculatedCacheContextInterface {
   protected PasswordAccessManagerInterface $passwordAccessManager;
 
   /**
+   * The entries already processed.
+   *
+   * @var array
+   */
+  protected array $processedEntries = [];
+
+  /**
    * Constructor.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
@@ -65,29 +72,38 @@ class EntityIsProtectedCacheContext implements CalculatedCacheContextInterface {
    * {@inheritdoc}
    */
   public function getContext($entity_info = NULL) : string {
+    if (isset($this->processedEntries[$entity_info]['context_value'])) {
+      return $this->processedEntries[$entity_info]['context_value'];
+    }
+
     // Impossible to determine the entity so do nothing.
     if (is_null($entity_info)) {
-      return '0';
+      $this->processedEntries[$entity_info]['context_value'] = '0';
+      return $this->processedEntries[$entity_info]['context_value'];
     }
 
     $entity = $this->loadEntity($entity_info);
     if ($entity == NULL) {
-      return '0';
+      $this->processedEntries[$entity_info]['context_value'] = '0';
+      return $this->processedEntries[$entity_info]['context_value'];
     }
-    $entity_info = explode('||', $entity_info);
-    $view_mode = $entity_info[2];
+    $parsed_entity_info = explode('||', $entity_info);
+    $view_mode = $parsed_entity_info[2];
 
     // Entity view mode is not protected.
     if (!$this->passwordAccessManager->isEntityViewModeProtected($view_mode, $entity)) {
-      return '0';
+      $this->processedEntries[$entity_info]['context_value'] = '0';
+      return $this->processedEntries[$entity_info]['context_value'];
     }
 
     // User has access.
     if ($this->passwordAccessManager->hasUserAccessToEntity($entity)) {
-      return '0';
+      $this->processedEntries[$entity_info]['context_value'] = '0';
+      return $this->processedEntries[$entity_info]['context_value'];
     }
     else {
-      return '1';
+      $this->processedEntries[$entity_info]['context_value'] = '1';
+      return $this->processedEntries[$entity_info]['context_value'];
     }
   }
 
@@ -95,18 +111,22 @@ class EntityIsProtectedCacheContext implements CalculatedCacheContextInterface {
    * {@inheritdoc}
    */
   public function getCacheableMetadata($entity_info = NULL) : CacheableMetadata {
-    $cache_metadata = new CacheableMetadata();
+    if (isset($this->processedEntries[$entity_info]['cacheable_metadata'])) {
+      return $this->processedEntries[$entity_info]['cacheable_metadata'];
+    }
+
+    $this->processedEntries[$entity_info]['cacheable_metadata'] = new CacheableMetadata();
 
     if (is_null($entity_info)) {
-      return $cache_metadata;
+      return $this->processedEntries[$entity_info]['cacheable_metadata'];
     }
     $entity = $this->loadEntity($entity_info);
     if ($entity == NULL) {
-      return $cache_metadata;
+      return $this->processedEntries[$entity_info]['cacheable_metadata'];
     }
 
-    $cache_metadata->addCacheableDependency($entity);
-    return $cache_metadata;
+    $this->processedEntries[$entity_info]['cacheable_metadata']->addCacheableDependency($entity);
+    return $this->processedEntries[$entity_info]['cacheable_metadata'];
   }
 
   /**
