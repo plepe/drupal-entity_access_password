@@ -75,9 +75,9 @@ class PasswordForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, array $arg = []) : array {
+  public function buildForm(array $form, FormStateInterface $form_state) : array {
     // Not possible to know for which entity the form is built against.
-    if (!isset($arg['field'])) {
+    if (empty($form_state->getBuildInfo()['args'])) {
       return [];
     }
 
@@ -94,11 +94,6 @@ class PasswordForm extends FormBase {
       '#type' => 'submit',
       '#value' => $this->t('Submit'),
     ];
-
-    // Set the arg to use on validation and submit.
-    $storage = $form_state->getStorage();
-    $storage['args'] = $arg;
-    $form_state->setStorage($storage);
 
     // Required if the form is displayed several times.
     // @see https://www.drupal.org/project/drupal/issues/2821852.
@@ -152,8 +147,7 @@ class PasswordForm extends FormBase {
 
     /** @var string $password */
     $password = $form_state->getValue('form_password');
-    $storage = $form_state->getStorage();
-    $form_state->set('password_is_valid', $this->passwordValidator->validatePassword($password, $storage['args']['field']));
+    $form_state->set('password_is_valid', $this->passwordValidator->validatePassword($password, $form_state->getBuildInfo()['args'][0]));
   }
 
   /**

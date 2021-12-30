@@ -4,15 +4,10 @@ declare(strict_types = 1);
 
 namespace Drupal\entity_access_password\Plugin\Field\FieldFormatter;
 
-use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Component\Utility\Xss;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
-use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\entity_access_password\Form\PasswordForm;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\entity_access_password\Service\PasswordFormBuilder;
 
 /**
  * Plugin implementation of the 'entity_access_password_form' formatter.
@@ -25,23 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   }
  * )
  */
-class EntityAccessPasswordFormFormatter extends FormatterBase implements ContainerFactoryPluginInterface {
-
-  /**
-   * The form builder.
-   *
-   * @var \Drupal\Core\Form\FormBuilderInterface
-   */
-  protected FormBuilderInterface $formBuilder;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) : self {
-    $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
-    $instance->formBuilder = $container->get('form_builder');
-    return $instance;
-  }
+class EntityAccessPasswordFormFormatter extends FormatterBase {
 
   /**
    * {@inheritdoc}
@@ -86,7 +65,7 @@ class EntityAccessPasswordFormFormatter extends FormatterBase implements Contain
       return $elements;
     }
 
-    /** @var \Drupal\Core\TypedData\TypedDataInterface $itemsData */
+    /** @var \Drupal\entity_access_password\Plugin\Field\FieldType\EntityAccessPasswordItem $itemsData */
     $itemsData = $items->get(0);
     /** @var array $values */
     $values = $itemsData->getValue();
@@ -99,12 +78,20 @@ class EntityAccessPasswordFormFormatter extends FormatterBase implements Contain
     /** @var string $help_text */
     $help_text = $this->getSetting('help_text');
 
+    /** @var \Drupal\Core\Entity\FieldableEntityInterface $entity */
+    $entity = $itemsData->getEntity();
+
     $elements[] = [
-      '#theme' => 'entity_access_password_form',
-      '#help_text' => new FormattableMarkup(Xss::filterAdmin($help_text), []),
-      '#hint' => XSS::filter($values['hint']),
-      // @phpstan-ignore-next-line
-      '#form' => $this->formBuilder->getForm(PasswordForm::class, ['field' => $itemsData]),
+      '#lazy_builder' => [PasswordFormBuilder::SERVICE_ID . ':build',
+        [
+          $help_text,
+          $values['hint'],
+          $entity->id(),
+          $entity->getEntityTypeId(),
+          $items->getName(),
+        ],
+      ],
+      '#create_placeholder' => TRUE,
     ];
 
     return $elements;

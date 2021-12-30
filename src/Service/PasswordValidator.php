@@ -63,11 +63,11 @@ class PasswordValidator implements PasswordValidatorInterface {
     /** @var array $values */
     $values = $fieldItem->getValue();
 
+    // @todo password hierarchy.
     if (!empty($values['password'])) {
       $password_is_valid = $this->password->check($password, $values['password']);
     }
 
-    // @todo password hierarchy.
     if ($password_is_valid) {
       $entity = $fieldItem->getEntity();
       $this->accessStorage->storeEntityAccess($entity);
