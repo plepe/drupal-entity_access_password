@@ -79,4 +79,30 @@ class SessionBackend implements AccessStorageInterface, AccessCheckerInterface {
     return FALSE;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function hasUserAccessToBundle(FieldableEntityInterface $entity) : bool {
+    /** @var array $session_data */
+    $session_data = $this->session->get(self::SESSION_KEY, []);
+    if (isset($session_data[$entity->getEntityTypeId()][$entity->bundle()]['bundle_access'])) {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasUserGlobalAccess() : bool {
+    /** @var array $session_data */
+    $session_data = $this->session->get(self::SESSION_KEY, []);
+    if (isset($session_data['global_access'])) {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
 }

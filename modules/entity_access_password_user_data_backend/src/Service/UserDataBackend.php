@@ -87,7 +87,7 @@ class UserDataBackend implements AccessStorageInterface, AccessCheckerInterface 
       return;
     }
 
-    $name = sprintf(self::BUNDLE_NAME_KEY, $entity->getEntityTypeId(), $entity->uuid());
+    $name = sprintf(self::BUNDLE_NAME_KEY, $entity->getEntityTypeId(), $entity->bundle());
     $this->userData->set(self::MODULE_NAME, $this->currentUser->id(), $name, TRUE);
   }
 
@@ -115,6 +115,41 @@ class UserDataBackend implements AccessStorageInterface, AccessCheckerInterface 
     $name = sprintf(self::ENTITY_NAME_KEY, $entity->getEntityTypeId(), $entity->uuid());
     $has_entity_access = $this->userData->get(self::MODULE_NAME, $this->currentUser->id(), $name);
     if ($has_entity_access) {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasUserAccessToBundle(FieldableEntityInterface $entity) : bool {
+    // Do nothing for anonymous user.
+    if ($this->currentUser->id() == 0) {
+      return FALSE;
+    }
+
+    $name = sprintf(self::BUNDLE_NAME_KEY, $entity->getEntityTypeId(), $entity->bundle());
+    $has_bundle_access = $this->userData->get(self::MODULE_NAME, $this->currentUser->id(), $name);
+    if ($has_bundle_access) {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasUserGlobalAccess() : bool {
+    // Do nothing for anonymous user.
+    if ($this->currentUser->id() == 0) {
+      return FALSE;
+    }
+
+    $has_global_access = $this->userData->get(self::MODULE_NAME, $this->currentUser->id(), self::GLOBAL_NAME_KEY);
+    if ($has_global_access) {
       return TRUE;
     }
 

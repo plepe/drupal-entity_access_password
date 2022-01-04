@@ -22,4 +22,23 @@ interface AccessCheckerInterface {
    */
   public function hasUserAccessToEntity(FieldableEntityInterface $entity) : bool;
 
+  /**
+   * Check if the current user has access to the entity's bundle.
+   *
+   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   *   The entity to check bundle access for.
+   *
+   * @return bool
+   *   TRUE if the user has access. FALSE otherwise.
+   */
+  public function hasUserAccessToBundle(FieldableEntityInterface $entity) : bool;
+
+  /**
+   * Check if the current user has global access.
+   *
+   * @return bool
+   *   TRUE if the user has access. FALSE otherwise.
+   */
+  public function hasUserGlobalAccess() : bool;
+
 }

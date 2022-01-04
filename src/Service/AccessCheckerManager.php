@@ -51,6 +51,34 @@ class AccessCheckerManager implements ChainAccessCheckerInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function hasUserAccessToBundle(FieldableEntityInterface $entity) : bool {
+    foreach ($this->getSortedCheckers() as $checker) {
+      // Stop on the first service granting access.
+      if ($checker->hasUserAccessToBundle($entity)) {
+        return TRUE;
+      }
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasUserGlobalAccess() : bool {
+    foreach ($this->getSortedCheckers() as $checker) {
+      // Stop on the first service granting access.
+      if ($checker->hasUserGlobalAccess()) {
+        return TRUE;
+      }
+    }
+
+    return FALSE;
+  }
+
+  /**
    * Returns the sorted array of checkers.
    *
    * @return \Drupal\entity_access_password\Service\AccessCheckerInterface[]

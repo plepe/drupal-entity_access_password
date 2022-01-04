@@ -121,6 +121,7 @@ class EntityTypeInfo implements ContainerInjectionInterface {
       $operations[self::ENTITY_OPERATION] = [
         'title' => $this->t('Edit password access user data'),
         'url' => $entity->toUrl(self::ENTITY_LINK_TEMPLATE),
+        'weight' => 50,
       ];
     }
     return $operations;

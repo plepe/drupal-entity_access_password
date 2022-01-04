@@ -38,8 +38,30 @@ class BypassPermissionAccessChecker implements AccessCheckerInterface {
    * {@inheritdoc}
    */
   public function hasUserAccessToEntity(FieldableEntityInterface $entity) : bool {
-    $entity->addCacheContexts(['user.permissions']);
+    return $this->bypassPermissionCheck();
+  }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function hasUserAccessToBundle(FieldableEntityInterface $entity) : bool {
+    return $this->bypassPermissionCheck();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasUserGlobalAccess() : bool {
+    return $this->bypassPermissionCheck();
+  }
+
+  /**
+   * Check if the user has the bypass permission.
+   *
+   * @return bool
+   *   TRUE if the user has the bypass permission. FALSE otherwise.
+   */
+  protected function bypassPermissionCheck() : bool {
     if ($this->currentUser->hasPermission(self::BYPASS_PERMISSION)) {
       return TRUE;
     }

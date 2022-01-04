@@ -56,18 +56,8 @@ class SettingsForm extends ConfigFormBase {
     $config = $this->config('entity_access_password.settings');
 
     $form['global_password'] = [
-      '#type' => 'details',
-      '#title' => $this->t('Global password'),
-      '#open' => TRUE,
-    ];
-    // @todo check if this boolean is still needed.
-    $form['global_password']['allow'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Allow global password'),
-      '#default_value' => $config->get('global_password.allow'),
-    ];
-    $form['global_password']['password'] = [
       '#type' => 'password_confirm',
+      '#title' => $this->t('Global password'),
       '#description' => $this->t('If left empty will not overwrite current password (if any).'),
       '#size' => 25,
     ];
@@ -90,12 +80,11 @@ class SettingsForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) : void {
     /** @var string $password */
-    $password = $form_state->getValue('password');
+    $password = $form_state->getValue('global_password');
 
     $config = $this->config('entity_access_password.settings');
-    $config->set('global_password.allow', $form_state->getValue('allow'));
     if ($password) {
-      $config->set('global_password.password', $this->password->hash($password));
+      $config->set('global_password', $this->password->hash($password));
     }
     $config->set('random_password_length', $form_state->getValue('random_password_length'));
     $config->save();

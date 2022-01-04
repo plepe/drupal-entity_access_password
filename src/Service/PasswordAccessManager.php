@@ -77,7 +77,31 @@ class PasswordAccessManager implements PasswordAccessManagerInterface {
       return TRUE;
     }
 
-    return $this->accessChecker->hasUserAccessToEntity($entity);
+    $password_fields = $this->getPasswordFields($entity);
+    foreach ($password_fields as $password_field) {
+      $field_instance_settings = $password_field->getFieldDefinition()->getSettings();
+
+      // Entity password.
+      if ($field_instance_settings['password_entity'] && $this->accessChecker->hasUserAccessToEntity($entity)) {
+        return TRUE;
+      }
+      // Bundle password.
+      elseif ($field_instance_settings['password_bundle'] && $this->accessChecker->hasUserAccessToBundle($entity)) {
+        return TRUE;
+      }
+      // Global password.
+      elseif ($field_instance_settings['password_global'] && $this->accessChecker->hasUserGlobalAccess()) {
+        return TRUE;
+      }
+
+      // Currently no support for multiple password fields on the same
+      // entity. So return as soon as possible.
+      return FALSE;
+    }
+
+    // This should not happen, but in case this method is called on an entity
+    // without password fields.
+    return TRUE;
   }
 
   /**

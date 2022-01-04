@@ -147,43 +147,46 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
       '#required' => $element['#required'],
     ];
 
-    // Allows password confirm states to depend only on the random password
-    // checkbox.
-    $element['password_wrapper'] = [
-      '#type' => 'container',
-      '#states' => [
-        'invisible' => [
-          ':input[name="' . $this->fieldDefinition->getName() . '[0][is_protected]"]' => [
-            'checked' => FALSE,
+    // Show entity password only if enabled.
+    if ($this->getFieldSetting('password_entity')) {
+      // Allows password confirm states to depend only on the random password
+      // checkbox.
+      $element['password_wrapper'] = [
+        '#type' => 'container',
+        '#states' => [
+          'invisible' => [
+            ':input[name="' . $this->fieldDefinition->getName() . '[0][is_protected]"]' => [
+              'checked' => FALSE,
+            ],
           ],
         ],
-      ],
-    ];
+      ];
 
-    if ($this->getSetting('allow_random_password')) {
-      $element['password_wrapper']['random_password'] = [
-        '#type' => 'checkbox',
-        '#title' => $this->t('Generate random password'),
-        '#default_value' => FALSE,
+      if ($this->getSetting('allow_random_password')) {
+        $element['password_wrapper']['random_password'] = [
+          '#type' => 'checkbox',
+          '#title' => $this->t('Generate random password'),
+          '#default_value' => FALSE,
+        ];
+      }
+
+      // Need to wrap password confirm for #states to work.
+      // @see https://www.drupal.org/project/drupal/issues/1427838.
+      $element['password_wrapper']['password_confirm_wrapper'] = [
+        '#type' => 'container',
+        '#states' => [
+          'invisible' => [
+            ':input[name="' . $this->fieldDefinition->getName() . '[0][password_wrapper][random_password]"]' => [
+              'checked' => TRUE,
+            ],
+          ],
+        ],
+      ];
+      $element['password_wrapper']['password_confirm_wrapper']['password'] = [
+        '#type' => 'password_confirm',
+        '#description' => $this->t('If left empty will not overwrite current password (if any).'),
       ];
     }
-
-    // Need to wrap password confirm for #states to work.
-    // @see https://www.drupal.org/project/drupal/issues/1427838.
-    $element['password_wrapper']['password_confirm_wrapper'] = [
-      '#type' => 'container',
-      '#states' => [
-        'invisible' => [
-          ':input[name="' . $this->fieldDefinition->getName() . '[0][password_wrapper][random_password]"]' => [
-            'checked' => TRUE,
-          ],
-        ],
-      ],
-    ];
-    $element['password_wrapper']['password_confirm_wrapper']['password'] = [
-      '#type' => 'password_confirm',
-      '#description' => $this->t('If left empty will not overwrite current password (if any).'),
-    ];
 
     $show_entity_title_setting = $this->getSetting('show_entity_title');
     switch ($show_entity_title_setting) {
@@ -259,6 +262,11 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) : array {
     foreach ($values as &$value) {
+      // Entity password is not enabled.
+      if (!isset($value['password_wrapper'])) {
+        continue;
+      }
+
       $password = $value['password_wrapper']['password_confirm_wrapper']['password'];
 
       // Random password.

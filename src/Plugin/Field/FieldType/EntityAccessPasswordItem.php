@@ -10,6 +10,7 @@ use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\Core\Url;
 
 /**
  * Defines the 'entity_access_password_password' field type.
@@ -30,6 +31,9 @@ class EntityAccessPasswordItem extends FieldItemBase {
    */
   public static function defaultFieldSettings() : array {
     return [
+      'password_entity' => FALSE,
+      'password_bundle' => FALSE,
+      'password_global' => FALSE,
       'password' => '',
       'view_modes' => [],
     ] + parent::defaultFieldSettings();
@@ -42,11 +46,53 @@ class EntityAccessPasswordItem extends FieldItemBase {
     $settings = $this->getSettings();
     $element = [];
 
+    $element['password_entity'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable per entity password access check'),
+      '#default_value' => $settings['password_entity'],
+    ];
+
+    $element['password_bundle'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable bundle password access check'),
+      '#default_value' => $settings['password_bundle'],
+    ];
+
+    // Hidden element to store already saved password if not changed.
     $element['password'] = [
+      '#type' => 'hidden',
+      '#value' => $settings['password'],
+    ];
+
+    // Need to wrap password confirm for #states to work.
+    // @see https://www.drupal.org/project/drupal/issues/1427838.
+    $element['password_wrapper'] = [
+      '#type' => 'container',
+      '#states' => [
+        'invisible' => [
+          ':input[name="settings[password_bundle]"]' => [
+            'checked' => FALSE,
+          ],
+        ],
+      ],
+    ];
+
+    $element['password_wrapper']['password'] = [
       '#type' => 'password_confirm',
-      '#title' => $this->t('Password'),
+      '#title' => $this->t('Bundle password'),
+      '#title_display' => 'hidden',
       '#description' => $this->t('To act as a per-bundle password. If left empty will not overwrite current password (if any).'),
       '#size' => 25,
+    ];
+
+    $element['password_global'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable global password access check'),
+      '#description' => $this->t('Please ensure that a global password is set on the <a href=":url">configuration</a> page.', [
+        ':url' => Url::fromRoute('entity_access_password.settings_form')->toString(),
+      ]),
+      '#default_value' => $settings['password_global'],
+      '#element_validate' => [[static::class, 'massagePassword']],
     ];
 
     $element['view_modes'] = [
@@ -58,6 +104,21 @@ class EntityAccessPasswordItem extends FieldItemBase {
     ];
 
     return $element;
+  }
+
+  /**
+   * Element validate function for password field.
+   */
+  public static function massagePassword(array $element, FormStateInterface $form_state) : void {
+    /** @var string $password */
+    $password = $form_state->getValue([
+      'settings',
+      'password_wrapper',
+      'password',
+    ]);
+    if (!empty($password)) {
+      $form_state->setValue(['settings', 'password'], \Drupal::service('password')->hash($password));
+    }
   }
 
   /**
