@@ -89,13 +89,7 @@ class EntityTypeInfo implements ContainerInjectionInterface {
       $entity_fields = $this->entityFieldManager->getFieldStorageDefinitions($entity_type_id);
       foreach ($entity_fields as $entity_field) {
         if ($entity_field->getType() == 'entity_access_password_password') {
-          if (
-            ($entity_type->getFormClass('default') || $entity_type->getFormClass('edit')) && $entity_type->hasLinkTemplate('edit-form') ||
-            $entity_type->hasLinkTemplate('canonical')
-          ) {
-            $entity_type->setLinkTemplate(self::ENTITY_LINK_TEMPLATE, "/entity_access_password_user_data_backend/$entity_type_id/{{$entity_type_id}}");
-          }
-
+          $entity_type->setLinkTemplate(self::ENTITY_LINK_TEMPLATE, "/entity_access_password_user_data_backend/$entity_type_id/{{$entity_type_id}}");
           break;
         }
       }
