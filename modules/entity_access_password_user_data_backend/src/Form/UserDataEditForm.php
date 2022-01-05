@@ -11,6 +11,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\entity_access_password_user_data_backend\Service\UserDataBackend;
 use Drupal\user\UserDataInterface;
+use Drupal\user\UserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -152,12 +153,27 @@ class UserDataEditForm extends FormBase {
     $users = $this->entityTypeManager->getStorage('user')->loadMultiple($uids);
     $options = [];
     foreach ($users as $user) {
-      $email = $user->getEmail();
-      if ($email != NULL) {
-        $options[$user->id()] = $email;
-      }
+      $options[$user->id()] = $this->formatUserOption($user);
     }
     return $options;
+  }
+
+  /**
+   * Format a user option.
+   *
+   * @param \Drupal\user\UserInterface $user
+   *   The user to format.
+   *
+   * @return string
+   *   The formatted user option.
+   */
+  protected function formatUserOption(UserInterface $user) : string {
+    $option = $user->getDisplayName();
+    $email = $user->getEmail();
+    if ($email != NULL) {
+      $option .= " ($email)";
+    }
+    return $option;
   }
 
 }

@@ -140,6 +140,8 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
     /** @var \Drupal\entity_access_password\Plugin\Field\FieldType\EntityAccessPasswordItem $item */
     $item = $items[$delta];
 
+    $states_selector = $this->getStatesSelector($element);
+
     $element['is_protected'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Enable password protection'),
@@ -155,7 +157,7 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
         '#type' => 'container',
         '#states' => [
           'invisible' => [
-            ':input[name="' . $this->fieldDefinition->getName() . '[0][is_protected]"]' => [
+            ':input[name="' . $states_selector . '[' . $delta . '][is_protected]"]' => [
               'checked' => FALSE,
             ],
           ],
@@ -176,7 +178,7 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
         '#type' => 'container',
         '#states' => [
           'invisible' => [
-            ':input[name="' . $this->fieldDefinition->getName() . '[0][password_wrapper][random_password]"]' => [
+            ':input[name="' . $states_selector . '[' . $delta . '][password_wrapper][random_password]"]' => [
               'checked' => TRUE,
             ],
           ],
@@ -204,7 +206,7 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
           '#default_value' => isset($items[$delta]->show_title) ? $items[$delta]->show_title : FALSE,
           '#states' => [
             'invisible' => [
-              ':input[name="' . $this->fieldDefinition->getName() . '[0][is_protected]"]' => [
+              ':input[name="' . $states_selector . '[' . $delta . '][is_protected]"]' => [
                 'checked' => FALSE,
               ],
             ],
@@ -235,7 +237,7 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
         '#required' => ($element['#required'] && $show_hint_setting === 'always'),
         '#states' => [
           'invisible' => [
-            ':input[name="' . $this->fieldDefinition->getName() . '[0][is_protected]"]' => [
+            ':input[name="' . $states_selector . '[' . $delta . '][is_protected]"]' => [
               'checked' => FALSE,
             ],
           ],
@@ -270,7 +272,7 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
       $password = $value['password_wrapper']['password_confirm_wrapper']['password'];
 
       // Random password.
-      if ($value['password_wrapper']['random_password']) {
+      if (isset($value['password_wrapper']['random_password']) && $value['password_wrapper']['random_password']) {
         $global_settings = $this->configFactory->get(SettingsForm::CONFIG_NAME);
         /** @var int $random_password_length */
         $random_password_length = $global_settings->get('random_password_length');
@@ -330,6 +332,27 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
       'optional' => $this->t('Optional'),
       'always' => $this->t('Always'),
     ];
+  }
+
+  /**
+   * Get a generic #states selector for this widget.
+   *
+   * @param array $element
+   *   The form element.
+   *
+   * @return string
+   *   The selector.
+   */
+  protected function getStatesSelector(array $element) : string {
+    $field_name = $this->fieldDefinition->getName();
+
+    $parents = $element['#field_parents'];
+    $parents[] = $field_name;
+    $selector = $root = array_shift($parents);
+    if ($parents) {
+      $selector = $root . '[' . implode('][', $parents) . ']';
+    }
+    return $selector;
   }
 
 }
