@@ -22,7 +22,7 @@ class RouteSubscriber extends RouteSubscriberBase {
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * Constructor.
@@ -72,8 +72,8 @@ class RouteSubscriber extends RouteSubscriberBase {
       $route = new Route($entity_template);
       $route
         ->addDefaults([
-          '_title' => 'Edit password access user data',
-          '_form' => '\Drupal\entity_access_password_user_data_backend\Form\UserDataEditForm',
+          '_title' => 'Entity password user data',
+          '_form' => '\Drupal\entity_access_password_user_data_backend\Form\EntityUserDataEditForm',
         ])
         ->addRequirements([
           '_permission' => EntityTypeInfo::ACCESS_PERMISSION,

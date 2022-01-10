@@ -39,17 +39,17 @@ class EntityTypeInfo implements ContainerInjectionInterface {
    *
    * @var \Drupal\Core\Session\AccountProxyInterface
    */
-  protected $currentUser;
+  protected AccountProxyInterface $currentUser;
 
   /**
    * The entity field manager.
    *
    * @var \Drupal\Core\Entity\EntityFieldManagerInterface
    */
-  protected $entityFieldManager;
+  protected EntityFieldManagerInterface $entityFieldManager;
 
   /**
-   * EntityTypeInfo constructor.
+   * Constructor.
    *
    * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
    *   The current user.
@@ -81,6 +81,9 @@ class EntityTypeInfo implements ContainerInjectionInterface {
    *   The entity type list to alter.
    */
   public function entityTypeAlter(array &$entity_types) : void {
+    // Can not use
+    // EntityTypePasswordBundleInfoInterface::getAllPasswordBundleInfo()
+    // because of memory issue.
     foreach ($entity_types as $entity_type_id => $entity_type) {
       if (!$entity_type instanceof ContentEntityTypeInterface) {
         continue;
@@ -112,11 +115,18 @@ class EntityTypeInfo implements ContainerInjectionInterface {
       $this->currentUser->hasPermission(self::ACCESS_PERMISSION) &&
       $entity->access('edit')
     ) {
-      $operations[self::ENTITY_OPERATION] = [
-        'title' => $this->t('Edit password access user data'),
-        'url' => $entity->toUrl(self::ENTITY_LINK_TEMPLATE),
-        'weight' => 50,
-      ];
+      $fields = $entity->getFields();
+      foreach ($fields as $field) {
+        $field_definition = $field->getFieldDefinition();
+        if ($field_definition->getType() == 'entity_access_password_password') {
+          $operations[self::ENTITY_OPERATION] = [
+            'title' => $this->t('Edit password access user data'),
+            'url' => $entity->toUrl(self::ENTITY_LINK_TEMPLATE),
+            'weight' => 50,
+          ];
+          break;
+        }
+      }
     }
     return $operations;
   }

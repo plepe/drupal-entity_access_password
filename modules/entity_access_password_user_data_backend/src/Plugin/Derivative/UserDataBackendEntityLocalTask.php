@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Provides local task definitions for entity bundles.
  */
-class UserDataBackendLocalTask extends DeriverBase implements ContainerDeriverInterface {
+class UserDataBackendEntityLocalTask extends DeriverBase implements ContainerDeriverInterface {
 
   use StringTranslationTrait;
 
@@ -23,13 +23,13 @@ class UserDataBackendLocalTask extends DeriverBase implements ContainerDeriverIn
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * Constructor.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity manager.
+   *   The entity type manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
     $this->entityTypeManager = $entity_type_manager;

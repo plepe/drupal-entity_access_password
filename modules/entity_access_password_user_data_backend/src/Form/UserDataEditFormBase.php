@@ -5,19 +5,17 @@ declare(strict_types = 1);
 namespace Drupal\entity_access_password_user_data_backend\Form;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\entity_access_password_user_data_backend\Service\UserDataBackend;
 use Drupal\user\UserDataInterface;
 use Drupal\user\UserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Provides form to remove access (stored in user data) to the entity.
+ * Provides base form class to remove access (stored in user data).
  */
-class UserDataEditForm extends FormBase {
+Abstract class UserDataEditFormBase extends FormBase {
 
   /**
    * The user data.
@@ -34,29 +32,13 @@ class UserDataEditForm extends FormBase {
   protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
-   * Constructor.
-   *
-   * @param \Drupal\user\UserDataInterface $userData
-   *   The user data.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   */
-  public function __construct(
-    UserDataInterface $userData,
-    EntityTypeManagerInterface $entityTypeManager
-  ) {
-    $this->userData = $userData;
-    $this->entityTypeManager = $entityTypeManager;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) : self {
-    return new self(
-      $container->get('user.data'),
-      $container->get('entity_type.manager')
-    );
+    $instance = parent::create($container);
+    $instance->userData = $container->get('user.data');
+    $instance->entityTypeManager = $container->get('entity_type.manager');
+    return $instance;
   }
 
   /**
@@ -70,19 +52,18 @@ class UserDataEditForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) : array {
-    $entity = $this->getEntityFromRouteMatch($this->getRouteMatch());
+    $name = $this->getUserDataName();
 
     // Not possible to know for which entity the form is built against.
-    if (!$entity instanceof FieldableEntityInterface) {
+    if (empty($name)) {
       return [];
     }
-    $name = sprintf(UserDataBackend::ENTITY_NAME_KEY, $entity->getEntityTypeId(), $entity->uuid());
     $form_state->addBuildInfo('user_data_name', $name);
 
     $form['users'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Users with access'),
-      '#description' => $this->t('Check users to remove their access to this content.'),
+      '#description' => $this->t('Check users to remove their access.'),
       '#options' => $this->getUsersOptions($name),
     ];
 
@@ -104,8 +85,8 @@ class UserDataEditForm extends FormBase {
     $build_info = $form_state->getBuildInfo();
     /** @var array $users */
     $users = $form_state->getValue('users');
-    foreach ($users as $user_id => $user_email) {
-      if ($user_email === 0) {
+    foreach ($users as $user_id => $user_display_option) {
+      if ($user_display_option === 0) {
         continue;
       }
 
@@ -115,24 +96,12 @@ class UserDataEditForm extends FormBase {
   }
 
   /**
-   * Retrieves entity from route match.
+   * Retrieve user data name.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The route match.
-   *
-   * @return \Drupal\Core\Entity\EntityInterface|null
-   *   The entity object as determined from the passed-in route match.
+   * @return string
+   *   The user data name. Empty string if not possible to determine one.
    */
-  protected function getEntityFromRouteMatch(RouteMatchInterface $route_match) {
-    $route = $route_match->getRouteObject();
-
-    if ($route == NULL) {
-      return NULL;
-    }
-    $parameter_name = $route->getOption('_eapudb_entity_type_id');
-    // @phpstan-ignore-next-line
-    return $route_match->getParameter($parameter_name);
-  }
+  abstract protected function getUserDataName() : string;
 
   /**
    * Get the options.
