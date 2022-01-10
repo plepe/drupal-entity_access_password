@@ -20,7 +20,9 @@ class BundleUserDataEditForm extends UserDataEditFormBase {
       return '';
     }
 
+    /** @var string $entity_type_id */
     $entity_type_id = $route->getOption('_eapudb_entity_type_id');
+    /** @var string $bundle_id */
     $bundle_id = $route->getOption('_eapudb_bundle_id');
 
     if ($entity_type_id == NULL || $bundle_id == NULL) {

@@ -4,47 +4,12 @@ declare(strict_types = 1);
 
 namespace Drupal\entity_access_password_user_data_backend\Plugin\Derivative;
 
-use Drupal\Component\Plugin\Derivative\DeriverBase;
-use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\entity_access_password\Service\EntityTypePasswordBundleInfoInterface;
 use Drupal\entity_access_password_user_data_backend\Routing\BundleFormRoutes;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides local task definitions for bundles.
  */
-class UserDataBackendBundleLocalTask extends DeriverBase implements ContainerDeriverInterface {
-
-  use StringTranslationTrait;
-
-  /**
-   * The entity type password bundle info.
-   *
-   * @var \Drupal\entity_access_password\Service\EntityTypePasswordBundleInfoInterface
-   */
-  protected EntityTypePasswordBundleInfoInterface $entityTypePasswordBundleInfo;
-
-  /**
-   * Constructor.
-   *
-   * @param \Drupal\entity_access_password\Service\EntityTypePasswordBundleInfoInterface $entityTypePasswordBundleInfo
-   *   The entity type password bundle info.
-   */
-  public function __construct(
-    EntityTypePasswordBundleInfoInterface $entityTypePasswordBundleInfo
-  ) {
-    $this->entityTypePasswordBundleInfo = $entityTypePasswordBundleInfo;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, $base_plugin_id) : self {
-    return new self(
-      $container->get('entity_access_password.entity_type_password_bundle_info')
-    );
-  }
+class UserDataBackendBundleLocalTask extends UserDataBackendDeriverBase {
 
   /**
    * {@inheritdoc}
@@ -66,7 +31,6 @@ class UserDataBackendBundleLocalTask extends DeriverBase implements ContainerDer
           'route_name' => $route_name,
           'parent_id' => 'entity_access_password_user_data_backend.admin_tab',
         ];
-        break;
       }
     }
 

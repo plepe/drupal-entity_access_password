@@ -5,11 +5,12 @@ declare(strict_types = 1);
 namespace Drupal\entity_access_password_user_data_backend\HookHandler;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\Core\Entity\ContentEntityTypeInterface;
-use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
+use Drupal\entity_access_password_user_data_backend\Routing\EntityFormRoutes;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -25,11 +26,6 @@ class EntityTypeInfo implements ContainerInjectionInterface {
   public const ACCESS_PERMISSION = 'entity_access_password_user_data_backend_access_entity_form';
 
   /**
-   * The entity link template to edit user data.
-   */
-  public const ENTITY_LINK_TEMPLATE = 'entity-access-password-user-data-edit';
-
-  /**
    * The entity operation. Also used for the dynamic route and task link.
    */
   public const ENTITY_OPERATION = 'entity_access_password_user_data_edit';
@@ -42,26 +38,15 @@ class EntityTypeInfo implements ContainerInjectionInterface {
   protected AccountProxyInterface $currentUser;
 
   /**
-   * The entity field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
-   */
-  protected EntityFieldManagerInterface $entityFieldManager;
-
-  /**
    * Constructor.
    *
    * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
    *   The current user.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
-   *   The entity field manager.
    */
   public function __construct(
-    AccountProxyInterface $currentUser,
-    EntityFieldManagerInterface $entityFieldManager
+    AccountProxyInterface $currentUser
   ) {
     $this->currentUser = $currentUser;
-    $this->entityFieldManager = $entityFieldManager;
   }
 
   /**
@@ -69,34 +54,8 @@ class EntityTypeInfo implements ContainerInjectionInterface {
    */
   public static function create(ContainerInterface $container) : self {
     return new self(
-      $container->get('current_user'),
-      $container->get('entity_field.manager')
+      $container->get('current_user')
     );
-  }
-
-  /**
-   * Adds links to appropriate entity types.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface[] $entity_types
-   *   The entity type list to alter.
-   */
-  public function entityTypeAlter(array &$entity_types) : void {
-    // Can not use
-    // EntityTypePasswordBundleInfoInterface::getAllPasswordBundleInfo()
-    // because of memory issue.
-    foreach ($entity_types as $entity_type_id => $entity_type) {
-      if (!$entity_type instanceof ContentEntityTypeInterface) {
-        continue;
-      }
-
-      $entity_fields = $this->entityFieldManager->getFieldStorageDefinitions($entity_type_id);
-      foreach ($entity_fields as $entity_field) {
-        if ($entity_field->getType() == 'entity_access_password_password') {
-          $entity_type->setLinkTemplate(self::ENTITY_LINK_TEMPLATE, "/entity_access_password_user_data_backend/$entity_type_id/{{$entity_type_id}}");
-          break;
-        }
-      }
-    }
   }
 
   /**
@@ -111,17 +70,22 @@ class EntityTypeInfo implements ContainerInjectionInterface {
   public function entityOperation(EntityInterface $entity) : array {
     $operations = [];
     if (
-      $entity->hasLinkTemplate(self::ENTITY_LINK_TEMPLATE) &&
+      $entity instanceof FieldableEntityInterface &&
       $this->currentUser->hasPermission(self::ACCESS_PERMISSION) &&
-      $entity->access('edit')
+      $entity->access('update')
     ) {
       $fields = $entity->getFields();
       foreach ($fields as $field) {
         $field_definition = $field->getFieldDefinition();
         if ($field_definition->getType() == 'entity_access_password_password') {
+          $entity_type_id = $entity->getEntityTypeId();
+          $bundle_id = $entity->bundle();
+          $route_name = sprintf(EntityFormRoutes::ROUTE_NAME, $entity_type_id, $bundle_id);
           $operations[self::ENTITY_OPERATION] = [
-            'title' => $this->t('Edit password access user data'),
-            'url' => $entity->toUrl(self::ENTITY_LINK_TEMPLATE),
+            'title' => $this->t('Password access user data'),
+            'url' => URL::fromRoute($route_name, [
+              $entity_type_id => $entity->id(),
+            ]),
             'weight' => 50,
           ];
           break;

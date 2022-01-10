@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Provides base form class to remove access (stored in user data).
  */
-Abstract class UserDataEditFormBase extends FormBase {
+abstract class UserDataEditFormBase extends FormBase {
 
   /**
    * The user data.
@@ -137,7 +137,7 @@ Abstract class UserDataEditFormBase extends FormBase {
    *   The formatted user option.
    */
   protected function formatUserOption(UserInterface $user) : string {
-    $option = $user->getDisplayName();
+    $option = (string) $user->getDisplayName();
     $email = $user->getEmail();
     if ($email != NULL) {
       $option .= " ($email)";
