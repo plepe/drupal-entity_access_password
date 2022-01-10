@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Drupal\entity_access_password\Form;
 
 use Drupal\Core\Flood\FloodInterface;
+use Drupal\Core\Form\BaseFormIdInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\entity_access_password\Service\PasswordValidatorInterface;
@@ -13,7 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Provides an Entity Access Password form.
  */
-class PasswordForm extends FormBase {
+class PasswordForm extends FormBase implements BaseFormIdInterface, PasswordFormInterface {
 
   /**
    * Flood config name.
@@ -45,6 +46,13 @@ class PasswordForm extends FormBase {
   protected PasswordValidatorInterface $passwordValidator;
 
   /**
+   * Prevent form cache problem of displaying the same form multiple times.
+   *
+   * @var string
+   */
+  protected string $formIdSuffix = '';
+
+  /**
    * {@inheritdoc}
    */
   public function __construct(
@@ -68,8 +76,25 @@ class PasswordForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() : string {
+  public function getBaseFormId() : string {
     return 'entity_access_password_password';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFormId() : string {
+    return 'entity_access_password_password_' . $this->formIdSuffix;
+  }
+
+  /**
+   * Prevent form cache problem of displaying the same form multiple times.
+   *
+   * @param string $suffix
+   *   The form ID suffix.
+   */
+  public function setFormIdSuffix(string $suffix) : void {
+    $this->formIdSuffix = $suffix;
   }
 
   /**
@@ -94,11 +119,6 @@ class PasswordForm extends FormBase {
       '#type' => 'submit',
       '#value' => $this->t('Submit'),
     ];
-
-    // Required if the form is displayed several times.
-    // @see https://www.drupal.org/project/drupal/issues/2821852.
-    $form_state->setRequestMethod('POST');
-    $form_state->setCached(TRUE);
 
     // Validation in two steps to properly handle flood and allow modules to
     // alter the form to add validation steps in between if needed.

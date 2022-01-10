@@ -9,7 +9,7 @@ use Drupal\Component\Utility\Xss;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
-use Drupal\entity_access_password\Form\PasswordForm;
+use Drupal\entity_access_password\Form\PasswordFormInterface;
 
 /**
  * Provides a lazy builder for password form.
@@ -36,19 +36,30 @@ class PasswordFormBuilder implements PasswordFormBuilderInterface, TrustedCallba
   protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
+   * The password form.
+   *
+   * @var \Drupal\entity_access_password\Form\PasswordFormInterface
+   */
+  protected PasswordFormInterface $passwordForm;
+
+  /**
    * Constructor.
    *
    * @param \Drupal\Core\Form\FormBuilderInterface $formBuilder
    *   The form builder.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
+   * @param \Drupal\entity_access_password\Form\PasswordFormInterface $passwordForm
+   *   The password form.
    */
   public function __construct(
     FormBuilderInterface $formBuilder,
-    EntityTypeManagerInterface $entityTypeManager
+    EntityTypeManagerInterface $entityTypeManager,
+    PasswordFormInterface $passwordForm
   ) {
     $this->formBuilder = $formBuilder;
     $this->entityTypeManager = $entityTypeManager;
+    $this->passwordForm = $passwordForm;
   }
 
   /**
@@ -60,13 +71,14 @@ class PasswordFormBuilder implements PasswordFormBuilderInterface, TrustedCallba
       ->load($entityId);
 
     $itemsData = $entity->get($fieldName)->get(0);
+    $this->passwordForm->setFormIdSuffix($entityTypeId . '_' . $entityId);
 
     return [
       '#theme' => 'entity_access_password_form',
       '#help_text' => new FormattableMarkup(Xss::filterAdmin($helpText), []),
       '#hint' => XSS::filter($hint),
       // @phpstan-ignore-next-line
-      '#form' => $this->formBuilder->getForm(PasswordForm::class, $itemsData),
+      '#form' => $this->formBuilder->getForm($this->passwordForm, $itemsData),
     ];
   }
 
