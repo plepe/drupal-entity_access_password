@@ -17,7 +17,7 @@ use Drupal\Core\Url;
  *
  * @FieldType(
  *   id = "entity_access_password_password",
- *   label = @Translation("Password Protection"),
+ *   label = @Translation("Password protection"),
  *   category = @Translation("Access"),
  *   default_formatter = "entity_access_password_form",
  *   default_widget = "entity_access_password_password",
