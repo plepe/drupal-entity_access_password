@@ -79,6 +79,13 @@ class PasswordAccessManager implements PasswordAccessManagerInterface {
 
     $password_fields = $this->getPasswordFields($entity);
     foreach ($password_fields as $password_field) {
+      // To allow to use this method on a potentially not protected entity.
+      /** @var array $field_values */
+      $field_values = $password_field->getValue();
+      if (!$field_values[0]['is_protected']) {
+        return TRUE;
+      }
+
       $field_instance_settings = $password_field->getFieldDefinition()->getSettings();
 
       // Entity password.
