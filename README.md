@@ -38,6 +38,11 @@ The modules does not implement hook_entity_access() to allow to still see
 password protected entities in listings otherwise the user would not be able to
 access the form to unlock the entity with a direct link.
 
+Development notes: The module makes an intensive usage of services and service
+collectors to be able to let you introduce your own logic if needed. Among those
+services, you can add your own password validation, access check and access
+storage logic by implementing services with the appropriate tags.
+
 
 REQUIREMENTS
 ------------

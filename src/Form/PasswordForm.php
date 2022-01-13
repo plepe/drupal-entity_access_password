@@ -69,7 +69,7 @@ class PasswordForm extends FormBase implements BaseFormIdInterface, PasswordForm
   public static function create(ContainerInterface $container) : self {
     return new self(
       $container->get('flood'),
-      $container->get('entity_access_password.password_validator')
+      $container->get('entity_access_password.password_validator_manager')
     );
   }
 
