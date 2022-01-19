@@ -27,7 +27,7 @@ interface PasswordAccessManagerInterface {
    * @return bool
    *   TRUE if protected. FALSE otherwise.
    */
-  public function isEntityViewModeProtected(string $view_mode, EntityInterface $entity) : bool;
+  public function isEntityViewModeProtected(string $view_mode, EntityInterface $entity): bool;
 
   /**
    * Check if the current user has access to the entity.
@@ -38,6 +38,6 @@ interface PasswordAccessManagerInterface {
    * @return bool
    *   TRUE if the user has access. FALSE otherwise.
    */
-  public function hasUserAccessToEntity(EntityInterface $entity) : bool;
+  public function hasUserAccessToEntity(EntityInterface $entity): bool;
 
 }

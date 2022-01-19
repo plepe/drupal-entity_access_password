@@ -12,7 +12,7 @@ class GlobalUserDataEditForm extends UserDataEditFormBase {
   /**
    * {@inheritdoc}
    */
-  protected function getUserDataName() : string {
+  protected function getUserDataName(): string {
     return $this->userDataBackend->getGlobalName();
   }
 

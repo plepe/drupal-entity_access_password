@@ -18,6 +18,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class FileDownload implements ContainerInjectionInterface {
 
   /**
+   * Return value expected by hook_file_download when denying access.
+   */
+  public const ACCESS_DENIED_RETURN = -1;
+
+  /**
    * The entity type manager.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
@@ -72,7 +77,7 @@ class FileDownload implements ContainerInjectionInterface {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) : self {
+  public static function create(ContainerInterface $container): self {
     return new self(
       $container->get('entity_type.manager'),
       $container->get('file.usage'),
@@ -110,7 +115,7 @@ class FileDownload implements ContainerInjectionInterface {
         // be most of the time only one entity.
         foreach ($entity_list as $entity_type_id => $entity_ids) {
           $entity_storage = $this->entityTypeManager->getStorage($entity_type_id);
-          $entities = $entity_storage->loadMultiple(array_keys($entity_ids));
+          $entities = $entity_storage->loadMultiple(\array_keys($entity_ids));
 
           // Allows to alter the list of entities.
           $file_usage_entity_list_event = new FileUsageEntityListEvent($file, $entities);
@@ -130,7 +135,7 @@ class FileDownload implements ContainerInjectionInterface {
       // It means that only password protected entities had been encountered
       // and that the user has access to none.
       if ($user_has_access === FALSE) {
-        return -1;
+        return self::ACCESS_DENIED_RETURN;
       }
     }
 

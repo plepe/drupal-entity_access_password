@@ -17,7 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Manipulates entity type information.
  */
 class EntityTypeInfo implements ContainerInjectionInterface {
-
   use StringTranslationTrait;
 
   /**
@@ -29,6 +28,11 @@ class EntityTypeInfo implements ContainerInjectionInterface {
    * The entity operation. Also used for the dynamic route and task link.
    */
   public const ENTITY_OPERATION = 'entity_access_password_user_data_edit';
+
+  /**
+   * The entity operation weight.
+   */
+  public const ENTITY_OPERATION_WEIGHT = 50;
 
   /**
    * The current user.
@@ -52,7 +56,7 @@ class EntityTypeInfo implements ContainerInjectionInterface {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) : self {
+  public static function create(ContainerInterface $container): self {
     return new self(
       $container->get('current_user')
     );
@@ -67,12 +71,12 @@ class EntityTypeInfo implements ContainerInjectionInterface {
    * @return array
    *   An array of operation definitions.
    */
-  public function entityOperation(EntityInterface $entity) : array {
+  public function entityOperation(EntityInterface $entity): array {
     $operations = [];
     if (
-      $entity instanceof FieldableEntityInterface &&
-      $this->currentUser->hasPermission(self::ACCESS_PERMISSION) &&
-      $entity->access('update')
+      $entity instanceof FieldableEntityInterface
+      && $this->currentUser->hasPermission(self::ACCESS_PERMISSION)
+      && $entity->access('update')
     ) {
       $fields = $entity->getFields();
       foreach ($fields as $field) {
@@ -80,13 +84,13 @@ class EntityTypeInfo implements ContainerInjectionInterface {
         if ($field_definition->getType() == 'entity_access_password_password') {
           $entity_type_id = $entity->getEntityTypeId();
           $bundle_id = $entity->bundle();
-          $route_name = sprintf(EntityFormRoutes::ROUTE_NAME, $entity_type_id, $bundle_id);
+          $route_name = \sprintf(EntityFormRoutes::ROUTE_NAME, $entity_type_id, $bundle_id);
           $operations[self::ENTITY_OPERATION] = [
             'title' => $this->t('Password access user data'),
             'url' => URL::fromRoute($route_name, [
               $entity_type_id => $entity->id(),
             ]),
-            'weight' => 50,
+            'weight' => self::ENTITY_OPERATION_WEIGHT,
           ];
           break;
         }

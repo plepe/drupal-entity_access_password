@@ -28,6 +28,6 @@ interface PasswordValidatorInterface {
    * @return bool
    *   TRUE if access is granted. FALSE otherwise.
    */
-  public function validatePassword(string $password, EntityAccessPasswordItem $fieldItem) : bool;
+  public function validatePassword(string $password, EntityAccessPasswordItem $fieldItem): bool;
 
 }

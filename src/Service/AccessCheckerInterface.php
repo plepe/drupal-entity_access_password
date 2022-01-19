@@ -20,7 +20,7 @@ interface AccessCheckerInterface {
    * @return bool
    *   TRUE if the user has access. FALSE otherwise.
    */
-  public function hasUserAccessToEntity(FieldableEntityInterface $entity) : bool;
+  public function hasUserAccessToEntity(FieldableEntityInterface $entity): bool;
 
   /**
    * Check if the current user has access to the entity's bundle.
@@ -31,7 +31,7 @@ interface AccessCheckerInterface {
    * @return bool
    *   TRUE if the user has access. FALSE otherwise.
    */
-  public function hasUserAccessToBundle(FieldableEntityInterface $entity) : bool;
+  public function hasUserAccessToBundle(FieldableEntityInterface $entity): bool;
 
   /**
    * Check if the current user has global access.
@@ -39,6 +39,6 @@ interface AccessCheckerInterface {
    * @return bool
    *   TRUE if the user has access. FALSE otherwise.
    */
-  public function hasUserGlobalAccess() : bool;
+  public function hasUserGlobalAccess(): bool;
 
 }

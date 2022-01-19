@@ -17,6 +17,6 @@ interface ChainAccessStorageInterface extends AccessStorageInterface {
    * @param int $priority
    *   Priority of the access storage.
    */
-  public function addStorage(AccessStorageInterface $accessStorage, $priority) : void;
+  public function addStorage(AccessStorageInterface $accessStorage, $priority): void;
 
 }

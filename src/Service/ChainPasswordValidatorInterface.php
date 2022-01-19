@@ -17,6 +17,6 @@ interface ChainPasswordValidatorInterface extends PasswordValidatorInterface {
    * @param int $priority
    *   Priority of the access validator.
    */
-  public function addValidator(PasswordValidatorInterface $accessValidator, $priority) : void;
+  public function addValidator(PasswordValidatorInterface $accessValidator, $priority): void;
 
 }

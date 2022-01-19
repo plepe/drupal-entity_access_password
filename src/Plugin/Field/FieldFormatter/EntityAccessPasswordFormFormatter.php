@@ -13,11 +13,11 @@ use Drupal\entity_access_password\Service\PasswordFormBuilder;
  * Plugin implementation of the 'entity_access_password_form' formatter.
  *
  * @FieldFormatter(
- *   id = "entity_access_password_form",
- *   label = @Translation("Password form"),
- *   field_types = {
- *     "entity_access_password_password"
- *   }
+ *     id = "entity_access_password_form",
+ *     label = @Translation("Password form"),
+ *     field_types = {
+ *         "entity_access_password_password"
+ *     }
  * )
  */
 class EntityAccessPasswordFormFormatter extends FormatterBase {
@@ -25,7 +25,7 @@ class EntityAccessPasswordFormFormatter extends FormatterBase {
   /**
    * {@inheritdoc}
    */
-  public static function defaultSettings() : array {
+  public static function defaultSettings(): array {
     return [
       'help_text' => '',
     ] + parent::defaultSettings();
@@ -34,7 +34,7 @@ class EntityAccessPasswordFormFormatter extends FormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function settingsForm(array $form, FormStateInterface $form_state) : array {
+  public function settingsForm(array $form, FormStateInterface $form_state): array {
     $form = parent::settingsForm($form, $form_state);
 
     $form['help_text'] = [
@@ -50,7 +50,7 @@ class EntityAccessPasswordFormFormatter extends FormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function settingsSummary() : array {
+  public function settingsSummary(): array {
     $summary = [];
     $summary[] = empty($this->getSetting('help_text')) ? $this->t('No help text') : $this->t('With help text');
     return $summary;
@@ -59,7 +59,7 @@ class EntityAccessPasswordFormFormatter extends FormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function viewElements(FieldItemListInterface $items, $langcode) : array {
+  public function viewElements(FieldItemListInterface $items, $langcode): array {
     $elements = [];
     if ($items->count() < 1) {
       return $elements;

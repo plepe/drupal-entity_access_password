@@ -16,20 +16,25 @@ use Drupal\Core\Url;
  * Defines the 'entity_access_password_password' field type.
  *
  * @FieldType(
- *   id = "entity_access_password_password",
- *   label = @Translation("Password protection"),
- *   category = @Translation("Access"),
- *   default_formatter = "entity_access_password_form",
- *   default_widget = "entity_access_password_password",
- *   cardinality = 1,
+ *     id = "entity_access_password_password",
+ *     label = @Translation("Password protection"),
+ *     category = @Translation("Access"),
+ *     default_formatter = "entity_access_password_form",
+ *     default_widget = "entity_access_password_password",
+ *     cardinality = 1,
  * )
  */
 class EntityAccessPasswordItem extends FieldItemBase {
 
   /**
+   * The database password column size.
+   */
+  public const PASSWORD_DB_LENGTH = 255;
+
+  /**
    * {@inheritdoc}
    */
-  public static function defaultFieldSettings() : array {
+  public static function defaultFieldSettings(): array {
     return [
       'password_entity' => FALSE,
       'password_bundle' => FALSE,
@@ -42,7 +47,7 @@ class EntityAccessPasswordItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public function fieldSettingsForm(array $form, FormStateInterface $form_state) : array {
+  public function fieldSettingsForm(array $form, FormStateInterface $form_state): array {
     $settings = $this->getSettings();
     $element = [];
 
@@ -82,7 +87,7 @@ class EntityAccessPasswordItem extends FieldItemBase {
       '#title' => $this->t('Bundle password'),
       '#title_display' => 'hidden',
       '#description' => $this->t('To act as a per-bundle password. If left empty will not overwrite current password (if any).'),
-      '#size' => 25,
+      '#size' => (int) 25,
     ];
 
     $element['password_global'] = [
@@ -109,7 +114,7 @@ class EntityAccessPasswordItem extends FieldItemBase {
   /**
    * Element validate function for password field.
    */
-  public static function massagePassword(array $element, FormStateInterface $form_state) : void {
+  public static function massagePassword(array $element, FormStateInterface $form_state): void {
     /** @var string $password */
     $password = $form_state->getValue([
       'settings',
@@ -124,17 +129,17 @@ class EntityAccessPasswordItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public function isEmpty() : bool {
+  public function isEmpty(): bool {
     $is_protected = $this->get('is_protected')->getValue();
     $password = $this->get('password')->getValue();
     $hint = $this->get('hint')->getValue();
     if ($is_protected === TRUE) {
       return FALSE;
     }
-    elseif (!empty($password)) {
+    if (!empty($password)) {
       return FALSE;
     }
-    elseif (!empty($hint)) {
+    if (!empty($hint)) {
       return FALSE;
     }
     return TRUE;
@@ -143,7 +148,7 @@ class EntityAccessPasswordItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public function preSave() : void {
+  public function preSave(): void {
     parent::preSave();
 
     /** @var array $current_value */
@@ -177,16 +182,16 @@ class EntityAccessPasswordItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) : array {
+  public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition): array {
     $properties = [];
     $properties['is_protected'] = DataDefinition::create('boolean')
-      ->setLabel(t('Entity is protected'));
+      ->setLabel(\t('Entity is protected'));
     $properties['show_title'] = DataDefinition::create('boolean')
-      ->setLabel(t('Show title'));
+      ->setLabel(\t('Show title'));
     $properties['hint'] = DataDefinition::create('string')
-      ->setLabel(t('Hint'));
+      ->setLabel(\t('Hint'));
     $properties['password'] = DataDefinition::create('string')
-      ->setLabel(t('Password'));
+      ->setLabel(\t('Password'));
 
     return $properties;
   }
@@ -201,7 +206,7 @@ class EntityAccessPasswordItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public static function schema(FieldStorageDefinitionInterface $field_definition) : array {
+  public static function schema(FieldStorageDefinitionInterface $field_definition): array {
     $columns = [
       'is_protected' => [
         'type' => 'int',
@@ -217,7 +222,7 @@ class EntityAccessPasswordItem extends FieldItemBase {
       ],
       'password' => [
         'type' => 'varchar',
-        'length' => 255,
+        'length' => self::PASSWORD_DB_LENGTH,
       ],
     ];
 
@@ -229,13 +234,13 @@ class EntityAccessPasswordItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public static function generateSampleValue(FieldDefinitionInterface $field_definition) : array {
+  public static function generateSampleValue(FieldDefinitionInterface $field_definition): array {
     $random = new Random();
     $values = [];
-    $values['is_protected'] = (bool) mt_rand(0, 1);
-    $values['show_title'] = (bool) mt_rand(0, 1);
+    $values['is_protected'] = (bool) \mt_rand(0, 1);
+    $values['show_title'] = (bool) \mt_rand(0, 1);
     $values['hint'] = $random->paragraphs(1);
-    $values['password'] = $random->word(mt_rand(1, 255));
+    $values['password'] = $random->word(\mt_rand(1, self::PASSWORD_DB_LENGTH));
 
     return $values;
   }

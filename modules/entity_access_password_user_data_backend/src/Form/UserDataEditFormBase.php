@@ -42,7 +42,7 @@ abstract class UserDataEditFormBase extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) : self {
+  public static function create(ContainerInterface $container): self {
     $instance = parent::create($container);
     $instance->userData = $container->get('user.data');
     $instance->entityTypeManager = $container->get('entity_type.manager');
@@ -53,14 +53,14 @@ abstract class UserDataEditFormBase extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() : string {
+  public function getFormId(): string {
     return 'entity_access_password_user_data_backend_edit';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) : array {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $name = $this->getUserDataName();
 
     // Not possible to know for which entity the form is built against.
@@ -103,7 +103,7 @@ abstract class UserDataEditFormBase extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) : void {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $build_info = $form_state->getBuildInfo();
     $revoke_all = $form_state->getValue('revoke_all');
 
@@ -120,11 +120,12 @@ abstract class UserDataEditFormBase extends FormBase {
     }
 
     // Access granting.
+    /** @var string $grant_area */
     $grant_area = $form_state->getValue('grant_area');
-    $grant_list = explode(',', str_replace(["\r", "\n"], ',', $grant_area));
+    $grant_list = \explode(',', \str_replace(["\r", "\n"], ',', $grant_area));
     $user_storage = $this->entityTypeManager->getStorage('user');
     foreach ($grant_list as $user_name_or_email) {
-      $user_name_or_email = trim($user_name_or_email);
+      $user_name_or_email = \trim($user_name_or_email);
       if (empty($user_name_or_email)) {
         continue;
       }
@@ -141,7 +142,7 @@ abstract class UserDataEditFormBase extends FormBase {
         continue;
       }
 
-      $grant_user_id = array_shift($grant_user_ids);
+      $grant_user_id = (int) \array_shift($grant_user_ids);
       $this->userData->set(UserDataBackend::MODULE_NAME, $grant_user_id, $build_info['user_data_name'], TRUE);
     }
   }
@@ -152,7 +153,7 @@ abstract class UserDataEditFormBase extends FormBase {
    * @return string
    *   The user data name. Empty string if not possible to determine one.
    */
-  abstract protected function getUserDataName() : string;
+  abstract protected function getUserDataName(): string;
 
   /**
    * Get the options.
@@ -163,11 +164,11 @@ abstract class UserDataEditFormBase extends FormBase {
    * @return array
    *   The array of user with access in their user data.
    */
-  protected function getUsersOptions(string $name) : array {
+  protected function getUsersOptions(string $name): array {
     /** @var array $entity_access */
     $entity_access = $this->userData->get(UserDataBackend::MODULE_NAME, NULL, $name);
 
-    $uids = array_keys($entity_access);
+    $uids = \array_keys($entity_access);
 
     /** @var \Drupal\user\UserInterface[] $users */
     $users = $this->entityTypeManager->getStorage('user')->loadMultiple($uids);
@@ -187,11 +188,11 @@ abstract class UserDataEditFormBase extends FormBase {
    * @return string
    *   The formatted user option.
    */
-  protected function formatUserOption(UserInterface $user) : string {
+  protected function formatUserOption(UserInterface $user): string {
     $option = (string) $user->getDisplayName();
     $email = $user->getEmail();
     if ($email != NULL) {
-      $option .= " ($email)";
+      $option .= " ({$email})";
     }
     return $option;
   }

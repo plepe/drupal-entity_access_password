@@ -17,6 +17,6 @@ interface ChainAccessCheckerInterface extends AccessCheckerInterface {
    * @param int $priority
    *   Priority of the access checker.
    */
-  public function addChecker(AccessCheckerInterface $accessChecker, $priority) : void;
+  public function addChecker(AccessCheckerInterface $accessChecker, $priority): void;
 
 }

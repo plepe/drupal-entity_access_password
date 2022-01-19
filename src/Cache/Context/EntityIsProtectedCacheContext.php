@@ -25,6 +25,11 @@ class EntityIsProtectedCacheContext implements CalculatedCacheContextInterface {
   public const CONTEXT_ID = 'entity_access_password_entity_is_protected';
 
   /**
+   * View mode position when parsing the view mode context.
+   */
+  public const VIEW_MODE_POSITION = 2;
+
+  /**
    * The entity type manager.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
@@ -65,19 +70,19 @@ class EntityIsProtectedCacheContext implements CalculatedCacheContextInterface {
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('Entity Access Password: Entity is protected.');
+    return \t('Entity Access Password: Entity is protected.');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getContext($entity_info = NULL) : string {
+  public function getContext($entity_info = NULL): string {
     if (isset($this->processedEntries[$entity_info]['context_value'])) {
       return $this->processedEntries[$entity_info]['context_value'];
     }
 
     // Impossible to determine the entity so do nothing.
-    if (is_null($entity_info)) {
+    if ($entity_info === NULL) {
       $this->processedEntries[$entity_info]['context_value'] = '0';
       return $this->processedEntries[$entity_info]['context_value'];
     }
@@ -87,8 +92,8 @@ class EntityIsProtectedCacheContext implements CalculatedCacheContextInterface {
       $this->processedEntries[$entity_info]['context_value'] = '0';
       return $this->processedEntries[$entity_info]['context_value'];
     }
-    $parsed_entity_info = explode('||', $entity_info);
-    $view_mode = $parsed_entity_info[2];
+    $parsed_entity_info = \explode('||', $entity_info);
+    $view_mode = $parsed_entity_info[self::VIEW_MODE_POSITION];
 
     // Entity view mode is not protected.
     if (!$this->passwordAccessManager->isEntityViewModeProtected($view_mode, $entity)) {
@@ -101,23 +106,22 @@ class EntityIsProtectedCacheContext implements CalculatedCacheContextInterface {
       $this->processedEntries[$entity_info]['context_value'] = '0';
       return $this->processedEntries[$entity_info]['context_value'];
     }
-    else {
-      $this->processedEntries[$entity_info]['context_value'] = '1';
-      return $this->processedEntries[$entity_info]['context_value'];
-    }
+
+    $this->processedEntries[$entity_info]['context_value'] = '1';
+    return $this->processedEntries[$entity_info]['context_value'];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCacheableMetadata($entity_info = NULL) : CacheableMetadata {
+  public function getCacheableMetadata($entity_info = NULL): CacheableMetadata {
     if (isset($this->processedEntries[$entity_info]['cacheable_metadata'])) {
       return $this->processedEntries[$entity_info]['cacheable_metadata'];
     }
 
     $this->processedEntries[$entity_info]['cacheable_metadata'] = new CacheableMetadata();
 
-    if (is_null($entity_info)) {
+    if ($entity_info === NULL) {
       return $this->processedEntries[$entity_info]['cacheable_metadata'];
     }
     $entity = $this->loadEntity($entity_info);
@@ -139,8 +143,8 @@ class EntityIsProtectedCacheContext implements CalculatedCacheContextInterface {
    *   The fieldable entity if found. NULL otherwise.
    */
   protected function loadEntity(string $entity_info) {
-    $entity_info = explode('||', $entity_info);
-    if (count($entity_info) != 3) {
+    $entity_info = \explode('||', $entity_info);
+    if (\count($entity_info) != (int) 3) {
       return NULL;
     }
     $entity_type_id = $entity_info[0];
@@ -157,12 +161,11 @@ class EntityIsProtectedCacheContext implements CalculatedCacheContextInterface {
     if ($entity == NULL) {
       return NULL;
     }
-    elseif (!$entity instanceof FieldableEntityInterface) {
+    if (!$entity instanceof FieldableEntityInterface) {
       return NULL;
     }
-    else {
-      return $entity;
-    }
+
+    return $entity;
   }
 
 }

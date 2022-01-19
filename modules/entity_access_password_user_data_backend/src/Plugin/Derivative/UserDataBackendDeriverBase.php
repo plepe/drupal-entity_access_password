@@ -14,7 +14,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Provides common code for deriver.
  */
 abstract class UserDataBackendDeriverBase extends DeriverBase implements ContainerDeriverInterface {
-
   use StringTranslationTrait;
 
   /**
@@ -39,7 +38,7 @@ abstract class UserDataBackendDeriverBase extends DeriverBase implements Contain
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, $base_plugin_id) : self {
+  public static function create(ContainerInterface $container, $base_plugin_id): self {
     // @phpstan-ignore-next-line
     return new static(
       $container->get('entity_access_password.entity_type_password_bundle_info')

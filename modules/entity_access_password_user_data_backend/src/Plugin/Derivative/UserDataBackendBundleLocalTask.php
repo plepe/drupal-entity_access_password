@@ -14,7 +14,7 @@ class UserDataBackendBundleLocalTask extends UserDataBackendDeriverBase {
   /**
    * {@inheritdoc}
    */
-  public function getDerivativeDefinitions($base_plugin_definition) : array {
+  public function getDerivativeDefinitions($base_plugin_definition): array {
     $this->derivatives = [];
 
     $password_infos = $this->entityTypePasswordBundleInfo->getAllPasswordBundleInfo();
@@ -22,7 +22,7 @@ class UserDataBackendBundleLocalTask extends UserDataBackendDeriverBase {
       /** @var \Drupal\Core\Entity\EntityTypeInterface $entity_type */
       $entity_type = $entity_infos['entity_type'];
       foreach ($entity_infos['bundles'] as $bundle_id => $bundle_infos) {
-        $route_name = sprintf(BundleFormRoutes::ROUTE_NAME, $entity_type_id, $bundle_id);
+        $route_name = \sprintf(BundleFormRoutes::ROUTE_NAME, $entity_type_id, $bundle_id);
         $this->derivatives[$route_name] = [
           'title' => $this->t('@entity_type: @bundle', [
             '@entity_type' => $entity_type->getLabel(),

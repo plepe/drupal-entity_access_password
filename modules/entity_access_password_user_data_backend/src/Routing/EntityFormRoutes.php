@@ -44,7 +44,7 @@ class EntityFormRoutes implements ContainerInjectionInterface {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) : self {
+  public static function create(ContainerInterface $container): self {
     return new self(
       $container->get('entity_access_password.entity_type_password_bundle_info')
     );
@@ -56,14 +56,14 @@ class EntityFormRoutes implements ContainerInjectionInterface {
    * @return \Symfony\Component\Routing\Route[]
    *   An array of route objects.
    */
-  public function routes() : array {
+  public function routes(): array {
     $routes = [];
 
     $password_infos = $this->entityTypePasswordBundleInfo->getAllPasswordBundleInfo();
     foreach ($password_infos as $entity_type_id => $entity_infos) {
-      foreach (array_keys($entity_infos['bundles']) as $bundle_id) {
-        $machine_name = sprintf(self::ROUTE_NAME, $entity_type_id, $bundle_id);
-        $route = new Route("/entity_access_password_user_data_backend/$entity_type_id/$bundle_id/{{$entity_type_id}}");
+      foreach (\array_keys($entity_infos['bundles']) as $bundle_id) {
+        $machine_name = \sprintf(self::ROUTE_NAME, $entity_type_id, $bundle_id);
+        $route = new Route("/entity_access_password_user_data_backend/{$entity_type_id}/{$bundle_id}/{{$entity_type_id}}");
         $route
           ->addDefaults([
             // @todo check if this is translatable and if possible to inject

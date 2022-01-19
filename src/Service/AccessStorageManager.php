@@ -30,7 +30,7 @@ class AccessStorageManager implements ChainAccessStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function addStorage(AccessStorageInterface $storage, $priority) : void {
+  public function addStorage(AccessStorageInterface $storage, $priority): void {
     $this->storages[$priority][] = $storage;
     // Force the storages to be re-sorted.
     $this->sortedStorages = NULL;
@@ -39,7 +39,7 @@ class AccessStorageManager implements ChainAccessStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function storeEntityAccess(FieldableEntityInterface $entity) : void {
+  public function storeEntityAccess(FieldableEntityInterface $entity): void {
     foreach ($this->getSortedStorages() as $storage) {
       $storage->storeEntityAccess($entity);
     }
@@ -48,7 +48,7 @@ class AccessStorageManager implements ChainAccessStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function storeEntityBundleAccess(FieldableEntityInterface $entity) : void {
+  public function storeEntityBundleAccess(FieldableEntityInterface $entity): void {
     foreach ($this->getSortedStorages() as $storage) {
       $storage->storeEntityBundleAccess($entity);
     }
@@ -57,7 +57,7 @@ class AccessStorageManager implements ChainAccessStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function storeGlobalAccess() : void {
+  public function storeGlobalAccess(): void {
     foreach ($this->getSortedStorages() as $storage) {
       $storage->storeGlobalAccess();
     }
@@ -72,11 +72,11 @@ class AccessStorageManager implements ChainAccessStorageInterface {
   protected function getSortedStorages() {
     if (!isset($this->sortedStorages)) {
       // Sort the storages according to priority.
-      krsort($this->storages);
+      \krsort($this->storages);
       // Merge nested storages from $this->storages into $this->sortedStorages.
       $this->sortedStorages = [];
       foreach ($this->storages as $storages) {
-        $this->sortedStorages = array_merge($this->sortedStorages, $storages);
+        $this->sortedStorages = \array_merge($this->sortedStorages, $storages);
       }
     }
     return $this->sortedStorages;

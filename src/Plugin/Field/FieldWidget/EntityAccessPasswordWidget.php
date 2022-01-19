@@ -18,9 +18,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Defines the 'entity_access_password_password' field widget.
  *
  * @FieldWidget(
- *   id = "entity_access_password_password",
- *   label = @Translation("Password Protection"),
- *   field_types = {"entity_access_password_password"},
+ *     id = "entity_access_password_password",
+ *     label = @Translation("Password Protection"),
+ *     field_types = {"entity_access_password_password"},
  * )
  */
 class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryPluginInterface {
@@ -42,7 +42,7 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) : self {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->password = $container->get('password');
     $instance->configFactory = $container->get('config.factory');
@@ -52,7 +52,7 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
   /**
    * {@inheritdoc}
    */
-  public static function defaultSettings() : array {
+  public static function defaultSettings(): array {
     return [
       'open' => FALSE,
       'show_entity_title' => 'optional',
@@ -64,7 +64,7 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
   /**
    * {@inheritdoc}
    */
-  public function settingsForm(array $form, FormStateInterface $form_state) : array {
+  public function settingsForm(array $form, FormStateInterface $form_state): array {
     $element = parent::settingsForm($form, $form_state);
 
     $element['open'] = [
@@ -119,7 +119,7 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
   /**
    * {@inheritdoc}
    */
-  public function settingsSummary() : array {
+  public function settingsSummary(): array {
     $summary = [];
     $summary[] = $this->getSetting('open') ? $this->t('Opened by default') : $this->t('Closed by default');
     $summary[] = $this->t('Show entity title: @value', [
@@ -136,7 +136,7 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
   /**
    * {@inheritdoc}
    */
-  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) : array {
+  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state): array {
     /** @var \Drupal\entity_access_password\Plugin\Field\FieldType\EntityAccessPasswordItem $item */
     $item = $items[$delta];
 
@@ -262,7 +262,7 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
   /**
    * {@inheritdoc}
    */
-  public function massageFormValues(array $values, array $form, FormStateInterface $form_state) : array {
+  public function massageFormValues(array $values, array $form, FormStateInterface $form_state): array {
     foreach ($values as &$value) {
       // Entity password is not enabled.
       if (!isset($value['password_wrapper'])) {
@@ -304,7 +304,7 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
    * @return array
    *   The setting options.
    */
-  protected function getShowTitleOptions() : array {
+  protected function getShowTitleOptions(): array {
     return $this->getShowOptions();
   }
 
@@ -314,7 +314,7 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
    * @return array
    *   The setting options.
    */
-  protected function getShowHintOptions() : array {
+  protected function getShowHintOptions(): array {
     return $this->getShowOptions();
   }
 
@@ -326,7 +326,7 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
    * @return array
    *   The settings options.
    */
-  protected function getShowOptions() : array {
+  protected function getShowOptions(): array {
     return [
       'never' => $this->t('Never'),
       'optional' => $this->t('Optional'),
@@ -343,14 +343,14 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
    * @return string
    *   The selector.
    */
-  protected function getStatesSelector(array $element) : string {
+  protected function getStatesSelector(array $element): string {
     $field_name = $this->fieldDefinition->getName();
 
     $parents = $element['#field_parents'];
     $parents[] = $field_name;
-    $selector = $root = array_shift($parents);
+    $selector = $root = \array_shift($parents);
     if ($parents) {
-      $selector = $root . '[' . implode('][', $parents) . ']';
+      $selector = $root . '[' . \implode('][', $parents) . ']';
     }
     return $selector;
   }

@@ -16,6 +16,6 @@ interface EntityTypePasswordBundleInfoInterface {
    *   The list of bundles infos with a password field keyed by bundle ID and
    *   in a first level keyed by entity type ID.
    */
-  public function getAllPasswordBundleInfo() : array;
+  public function getAllPasswordBundleInfo(): array;
 
 }

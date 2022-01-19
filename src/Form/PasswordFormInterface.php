@@ -15,6 +15,6 @@ interface PasswordFormInterface {
    * @param string $suffix
    *   The form ID suffix.
    */
-  public function setFormIdSuffix(string $suffix) : void;
+  public function setFormIdSuffix(string $suffix): void;
 
 }

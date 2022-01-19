@@ -65,7 +65,7 @@ class PasswordFormBuilder implements PasswordFormBuilderInterface, TrustedCallba
   /**
    * {@inheritdoc}
    */
-  public function build(string $helpText, string $hint, int $entityId, string $entityTypeId, string $fieldName) : array {
+  public function build(string $helpText, string $hint, int $entityId, string $entityTypeId, string $fieldName): array {
     /** @var \Drupal\Core\Entity\FieldableEntityInterface $entity */
     $entity = $this->entityTypeManager->getStorage($entityTypeId)
       ->load($entityId);
@@ -85,7 +85,7 @@ class PasswordFormBuilder implements PasswordFormBuilderInterface, TrustedCallba
   /**
    * {@inheritdoc}
    */
-  public static function trustedCallbacks() : array {
+  public static function trustedCallbacks(): array {
     return ['build'];
   }
 

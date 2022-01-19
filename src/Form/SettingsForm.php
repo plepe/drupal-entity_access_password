@@ -20,6 +20,16 @@ class SettingsForm extends ConfigFormBase {
   public const CONFIG_NAME = 'entity_access_password.settings';
 
   /**
+   * Minimum possible length of the random password.
+   */
+  public const RANDOM_PASSWORD_LENGTH_MIN = 8;
+
+  /**
+   * Maximum possible length of the random password.
+   */
+  public const RANDOM_PASSWORD_LENGTH_MAX = 50;
+
+  /**
    * The password hashing service.
    *
    * @var \Drupal\Core\Password\PasswordInterface
@@ -29,7 +39,7 @@ class SettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) : self {
+  public static function create(ContainerInterface $container): self {
     $instance = parent::create($container);
     $instance->password = $container->get('password');
     return $instance;
@@ -52,14 +62,14 @@ class SettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) : array {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $config = $this->config('entity_access_password.settings');
 
     $form['global_password'] = [
       '#type' => 'password_confirm',
       '#title' => $this->t('Global password'),
       '#description' => $this->t('If left empty will not overwrite current password (if any).'),
-      '#size' => 25,
+      '#size' => (int) 25,
     ];
     $form['random_password_length'] = [
       '#type' => 'number',
@@ -67,8 +77,8 @@ class SettingsForm extends ConfigFormBase {
       '#description' => $this->t('The length of the randomly generated passwords.'),
       '#default_value' => $config->get('random_password_length'),
       '#required' => TRUE,
-      '#min' => 8,
-      '#max' => 50,
+      '#min' => self::RANDOM_PASSWORD_LENGTH_MIN,
+      '#max' => self::RANDOM_PASSWORD_LENGTH_MAX,
       '#step' => 1,
     ];
 
@@ -78,7 +88,7 @@ class SettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) : void {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     /** @var string $password */
     $password = $form_state->getValue('global_password');
 

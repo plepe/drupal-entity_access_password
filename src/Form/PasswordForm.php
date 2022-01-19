@@ -66,7 +66,7 @@ class PasswordForm extends FormBase implements BaseFormIdInterface, PasswordForm
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) : self {
+  public static function create(ContainerInterface $container): self {
     return new self(
       $container->get('flood'),
       $container->get('entity_access_password.password_validator_manager')
@@ -76,14 +76,14 @@ class PasswordForm extends FormBase implements BaseFormIdInterface, PasswordForm
   /**
    * {@inheritdoc}
    */
-  public function getBaseFormId() : string {
+  public function getBaseFormId(): string {
     return 'entity_access_password_password';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getFormId() : string {
+  public function getFormId(): string {
     return 'entity_access_password_password_' . $this->formIdSuffix;
   }
 
@@ -93,14 +93,14 @@ class PasswordForm extends FormBase implements BaseFormIdInterface, PasswordForm
    * @param string $suffix
    *   The form ID suffix.
    */
-  public function setFormIdSuffix(string $suffix) : void {
+  public function setFormIdSuffix(string $suffix): void {
     $this->formIdSuffix = $suffix;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) : array {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     // Not possible to know for which entity the form is built against.
     if (empty($form_state->getBuildInfo()['args'])) {
       return [];
@@ -133,7 +133,7 @@ class PasswordForm extends FormBase implements BaseFormIdInterface, PasswordForm
    *
    * @see \Drupal\user\Form\UserLoginForm::validateAuthentication()
    */
-  public function validatePassword(array &$form, FormStateInterface $form_state) : void {
+  public function validatePassword(array &$form, FormStateInterface $form_state): void {
     $flood_config = $this->config(self::FLOOD_CONFIG_NAME);
     /** @var int $ip_limit */
     $ip_limit = $flood_config->get('ip_limit');
@@ -175,7 +175,7 @@ class PasswordForm extends FormBase implements BaseFormIdInterface, PasswordForm
    *
    * @see \Drupal\user\Form\UserLoginForm::validateFinal()
    */
-  public function validateFinal(array &$form, FormStateInterface $form_state) : void {
+  public function validateFinal(array &$form, FormStateInterface $form_state): void {
     $flood_config = $this->config(self::FLOOD_CONFIG_NAME);
     /** @var int $ip_window */
     $ip_window = $flood_config->get('ip_window');
@@ -218,7 +218,7 @@ class PasswordForm extends FormBase implements BaseFormIdInterface, PasswordForm
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) : void {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     // The access storage is managed in the password validator service because
     // it has the knowledge of the access perimeter (entity, bundle, global).
   }

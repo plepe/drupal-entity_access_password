@@ -28,7 +28,7 @@ class WebformSubmissionFileUsageSubscriber implements EventSubscriberInterface {
    * @param \Drupal\entity_access_password\Event\FileUsageEntityListEvent $event
    *   The event containing the entities.
    */
-  public function getWebformSubmissionParentEntities(FileUsageEntityListEvent $event) : void {
+  public function getWebformSubmissionParentEntities(FileUsageEntityListEvent $event): void {
     $entities = $event->getEntities();
     foreach ($entities as $key => $entity) {
       if (!($entity instanceof WebformSubmissionInterface)) {

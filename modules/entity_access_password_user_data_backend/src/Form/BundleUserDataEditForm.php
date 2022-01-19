@@ -12,7 +12,7 @@ class BundleUserDataEditForm extends UserDataEditFormBase {
   /**
    * {@inheritdoc}
    */
-  protected function getUserDataName() : string {
+  protected function getUserDataName(): string {
     $route = $this->getRouteMatch()->getRouteObject();
     if ($route == NULL) {
       return '';

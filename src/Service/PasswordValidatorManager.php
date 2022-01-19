@@ -30,7 +30,7 @@ class PasswordValidatorManager implements ChainPasswordValidatorInterface {
   /**
    * {@inheritdoc}
    */
-  public function addValidator(PasswordValidatorInterface $validator, $priority) : void {
+  public function addValidator(PasswordValidatorInterface $validator, $priority): void {
     $this->validators[$priority][] = $validator;
     // Force the validators to be re-sorted.
     $this->sortedValidators = NULL;
@@ -39,7 +39,7 @@ class PasswordValidatorManager implements ChainPasswordValidatorInterface {
   /**
    * {@inheritdoc}
    */
-  public function validatePassword(string $password, EntityAccessPasswordItem $fieldItem) : bool {
+  public function validatePassword(string $password, EntityAccessPasswordItem $fieldItem): bool {
     foreach ($this->getSortedValidators() as $validator) {
       if ($validator->validatePassword($password, $fieldItem)) {
         return TRUE;
@@ -58,11 +58,12 @@ class PasswordValidatorManager implements ChainPasswordValidatorInterface {
   protected function getSortedValidators() {
     if (!isset($this->sortedValidators)) {
       // Sort the validators according to priority.
-      krsort($this->validators);
-      // Merge nested validators from $this->validators into $this->sortedValidators.
+      \krsort($this->validators);
+      // Merge nested validators from $this->validators into
+      // $this->sortedValidators.
       $this->sortedValidators = [];
       foreach ($this->validators as $validators) {
-        $this->sortedValidators = array_merge($this->sortedValidators, $validators);
+        $this->sortedValidators = \array_merge($this->sortedValidators, $validators);
       }
     }
     return $this->sortedValidators;

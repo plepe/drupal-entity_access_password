@@ -30,7 +30,7 @@ class AccessCheckerManager implements ChainAccessCheckerInterface {
   /**
    * {@inheritdoc}
    */
-  public function addChecker(AccessCheckerInterface $checker, $priority) : void {
+  public function addChecker(AccessCheckerInterface $checker, $priority): void {
     $this->checkers[$priority][] = $checker;
     // Force the checkers to be re-sorted.
     $this->sortedCheckers = NULL;
@@ -39,7 +39,7 @@ class AccessCheckerManager implements ChainAccessCheckerInterface {
   /**
    * {@inheritdoc}
    */
-  public function hasUserAccessToEntity(FieldableEntityInterface $entity) : bool {
+  public function hasUserAccessToEntity(FieldableEntityInterface $entity): bool {
     foreach ($this->getSortedCheckers() as $checker) {
       // Stop on the first service granting access.
       if ($checker->hasUserAccessToEntity($entity)) {
@@ -53,7 +53,7 @@ class AccessCheckerManager implements ChainAccessCheckerInterface {
   /**
    * {@inheritdoc}
    */
-  public function hasUserAccessToBundle(FieldableEntityInterface $entity) : bool {
+  public function hasUserAccessToBundle(FieldableEntityInterface $entity): bool {
     foreach ($this->getSortedCheckers() as $checker) {
       // Stop on the first service granting access.
       if ($checker->hasUserAccessToBundle($entity)) {
@@ -67,7 +67,7 @@ class AccessCheckerManager implements ChainAccessCheckerInterface {
   /**
    * {@inheritdoc}
    */
-  public function hasUserGlobalAccess() : bool {
+  public function hasUserGlobalAccess(): bool {
     foreach ($this->getSortedCheckers() as $checker) {
       // Stop on the first service granting access.
       if ($checker->hasUserGlobalAccess()) {
@@ -87,11 +87,11 @@ class AccessCheckerManager implements ChainAccessCheckerInterface {
   protected function getSortedCheckers() {
     if (!isset($this->sortedCheckers)) {
       // Sort the checkers according to priority.
-      krsort($this->checkers);
+      \krsort($this->checkers);
       // Merge nested checkers from $this->checkers into $this->sortedCheckers.
       $this->sortedCheckers = [];
       foreach ($this->checkers as $checkers) {
-        $this->sortedCheckers = array_merge($this->sortedCheckers, $checkers);
+        $this->sortedCheckers = \array_merge($this->sortedCheckers, $checkers);
       }
     }
     return $this->sortedCheckers;

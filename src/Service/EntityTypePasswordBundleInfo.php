@@ -65,7 +65,7 @@ class EntityTypePasswordBundleInfo implements EntityTypePasswordBundleInfoInterf
   /**
    * {@inheritdoc}
    */
-  public function getAllPasswordBundleInfo() : array {
+  public function getAllPasswordBundleInfo(): array {
     if (!isset($this->passwordInfos)) {
       $password_infos = [];
 

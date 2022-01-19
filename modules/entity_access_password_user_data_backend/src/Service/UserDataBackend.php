@@ -13,7 +13,7 @@ use Drupal\user\UserDataInterface;
 /**
  * Handle access data in user data.
  */
-class UserDataBackend implements AccessStorageInterface, AccessCheckerInterface, UserDataBackendInterface {
+class UserDataBackend implements AccessCheckerInterface, AccessStorageInterface, UserDataBackendInterface {
 
   /**
    * The current user.
@@ -48,7 +48,7 @@ class UserDataBackend implements AccessStorageInterface, AccessCheckerInterface,
   /**
    * {@inheritdoc}
    */
-  public function storeEntityAccess(FieldableEntityInterface $entity) : void {
+  public function storeEntityAccess(FieldableEntityInterface $entity): void {
     // Do not store for anonymous user.
     if ($this->currentUser->id() == 0) {
       return;
@@ -60,7 +60,7 @@ class UserDataBackend implements AccessStorageInterface, AccessCheckerInterface,
   /**
    * {@inheritdoc}
    */
-  public function storeEntityBundleAccess(FieldableEntityInterface $entity) : void {
+  public function storeEntityBundleAccess(FieldableEntityInterface $entity): void {
     // Do not store for anonymous user.
     if ($this->currentUser->id() == 0) {
       return;
@@ -72,7 +72,7 @@ class UserDataBackend implements AccessStorageInterface, AccessCheckerInterface,
   /**
    * {@inheritdoc}
    */
-  public function storeGlobalAccess() : void {
+  public function storeGlobalAccess(): void {
     // Do not store for anonymous user.
     if ($this->currentUser->id() == 0) {
       return;
@@ -84,7 +84,7 @@ class UserDataBackend implements AccessStorageInterface, AccessCheckerInterface,
   /**
    * {@inheritdoc}
    */
-  public function hasUserAccessToEntity(FieldableEntityInterface $entity) : bool {
+  public function hasUserAccessToEntity(FieldableEntityInterface $entity): bool {
     // Do nothing for anonymous user.
     if ($this->currentUser->id() == 0) {
       return FALSE;
@@ -101,7 +101,7 @@ class UserDataBackend implements AccessStorageInterface, AccessCheckerInterface,
   /**
    * {@inheritdoc}
    */
-  public function hasUserAccessToBundle(FieldableEntityInterface $entity) : bool {
+  public function hasUserAccessToBundle(FieldableEntityInterface $entity): bool {
     // Do nothing for anonymous user.
     if ($this->currentUser->id() == 0) {
       return FALSE;
@@ -118,7 +118,7 @@ class UserDataBackend implements AccessStorageInterface, AccessCheckerInterface,
   /**
    * {@inheritdoc}
    */
-  public function hasUserGlobalAccess() : bool {
+  public function hasUserGlobalAccess(): bool {
     // Do nothing for anonymous user.
     if ($this->currentUser->id() == 0) {
       return FALSE;
@@ -135,28 +135,28 @@ class UserDataBackend implements AccessStorageInterface, AccessCheckerInterface,
   /**
    * {@inheritdoc}
    */
-  public function getEntityName(FieldableEntityInterface $entity) : string {
-    return sprintf(self::ENTITY_NAME_KEY, $entity->getEntityTypeId(), $entity->uuid());
+  public function getEntityName(FieldableEntityInterface $entity): string {
+    return \sprintf(self::ENTITY_NAME_KEY, $entity->getEntityTypeId(), $entity->uuid());
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getBundleName(string $entityTypeId, string $bundleId) : string {
-    return sprintf(self::BUNDLE_NAME_KEY, $entityTypeId, $bundleId);
+  public function getBundleName(string $entityTypeId, string $bundleId): string {
+    return \sprintf(self::BUNDLE_NAME_KEY, $entityTypeId, $bundleId);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getBundleNameFromEntity(FieldableEntityInterface $entity) : string {
-    return sprintf(self::BUNDLE_NAME_KEY, $entity->getEntityTypeId(), $entity->bundle());
+  public function getBundleNameFromEntity(FieldableEntityInterface $entity): string {
+    return \sprintf(self::BUNDLE_NAME_KEY, $entity->getEntityTypeId(), $entity->bundle());
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getGlobalName() : string {
+  public function getGlobalName(): string {
     return self::GLOBAL_NAME_KEY;
   }
 

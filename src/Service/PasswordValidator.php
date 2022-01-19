@@ -58,7 +58,7 @@ class PasswordValidator implements PasswordValidatorInterface {
   /**
    * {@inheritdoc}
    */
-  public function validatePassword(string $password, EntityAccessPasswordItem $fieldItem) : bool {
+  public function validatePassword(string $password, EntityAccessPasswordItem $fieldItem): bool {
     $field_instance_settings = $fieldItem->getFieldDefinition()->getSettings();
 
     // Entity password.

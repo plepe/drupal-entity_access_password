@@ -26,6 +26,6 @@ interface PasswordFormBuilderInterface {
    * @return array
    *   A render array for the password form.
    */
-  public function build(string $helpText, string $hint, int $entityId, string $entityTypeId, string $fieldName) : array;
+  public function build(string $helpText, string $hint, int $entityId, string $entityTypeId, string $fieldName): array;
 
 }

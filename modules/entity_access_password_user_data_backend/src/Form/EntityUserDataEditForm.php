@@ -15,7 +15,7 @@ class EntityUserDataEditForm extends UserDataEditFormBase {
   /**
    * {@inheritdoc}
    */
-  protected function getUserDataName() : string {
+  protected function getUserDataName(): string {
     $entity = $this->getEntityFromRouteMatch($this->getRouteMatch());
 
     // Not possible to know for which entity the form is built against.

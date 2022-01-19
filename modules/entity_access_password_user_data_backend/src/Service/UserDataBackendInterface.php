@@ -40,7 +40,7 @@ interface UserDataBackendInterface {
    * @return string
    *   The user data name.
    */
-  public function getEntityName(FieldableEntityInterface $entity) : string;
+  public function getEntityName(FieldableEntityInterface $entity): string;
 
   /**
    * Get the user data name for a bundle level access.
@@ -53,7 +53,7 @@ interface UserDataBackendInterface {
    * @return string
    *   The user data name.
    */
-  public function getBundleName(string $entityTypeId, string $bundleId) : string;
+  public function getBundleName(string $entityTypeId, string $bundleId): string;
 
   /**
    * Get the user data name for a bundle level access.
@@ -64,7 +64,7 @@ interface UserDataBackendInterface {
    * @return string
    *   The user data name.
    */
-  public function getBundleNameFromEntity(FieldableEntityInterface $entity) : string;
+  public function getBundleNameFromEntity(FieldableEntityInterface $entity): string;
 
   /**
    * Get the user data name for the global level access.
@@ -72,6 +72,6 @@ interface UserDataBackendInterface {
    * @return string
    *   The user data name.
    */
-  public function getGlobalName() : string;
+  public function getGlobalName(): string;
 
 }

@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 /**
  * Handle access data in session.
  */
-class SessionBackend implements AccessStorageInterface, AccessCheckerInterface {
+class SessionBackend implements AccessCheckerInterface, AccessStorageInterface {
 
   /**
    * Root session key for all session data.
@@ -39,7 +39,7 @@ class SessionBackend implements AccessStorageInterface, AccessCheckerInterface {
   /**
    * {@inheritdoc}
    */
-  public function storeEntityAccess(FieldableEntityInterface $entity) : void {
+  public function storeEntityAccess(FieldableEntityInterface $entity): void {
     /** @var array $session_data */
     $session_data = $this->session->get(self::SESSION_KEY, []);
     $session_data[$entity->getEntityTypeId()][$entity->bundle()][$entity->uuid()] = $entity->uuid();
@@ -49,7 +49,7 @@ class SessionBackend implements AccessStorageInterface, AccessCheckerInterface {
   /**
    * {@inheritdoc}
    */
-  public function storeEntityBundleAccess(FieldableEntityInterface $entity) : void {
+  public function storeEntityBundleAccess(FieldableEntityInterface $entity): void {
     /** @var array $session_data */
     $session_data = $this->session->get(self::SESSION_KEY, []);
     $session_data[$entity->getEntityTypeId()][$entity->bundle()]['bundle_access'] = TRUE;
@@ -59,7 +59,7 @@ class SessionBackend implements AccessStorageInterface, AccessCheckerInterface {
   /**
    * {@inheritdoc}
    */
-  public function storeGlobalAccess() : void {
+  public function storeGlobalAccess(): void {
     /** @var array $session_data */
     $session_data = $this->session->get(self::SESSION_KEY, []);
     $session_data['global_access'] = TRUE;
@@ -69,7 +69,7 @@ class SessionBackend implements AccessStorageInterface, AccessCheckerInterface {
   /**
    * {@inheritdoc}
    */
-  public function hasUserAccessToEntity(FieldableEntityInterface $entity) : bool {
+  public function hasUserAccessToEntity(FieldableEntityInterface $entity): bool {
     /** @var array $session_data */
     $session_data = $this->session->get(self::SESSION_KEY, []);
     if (isset($session_data[$entity->getEntityTypeId()][$entity->bundle()][$entity->uuid()])) {
@@ -82,7 +82,7 @@ class SessionBackend implements AccessStorageInterface, AccessCheckerInterface {
   /**
    * {@inheritdoc}
    */
-  public function hasUserAccessToBundle(FieldableEntityInterface $entity) : bool {
+  public function hasUserAccessToBundle(FieldableEntityInterface $entity): bool {
     /** @var array $session_data */
     $session_data = $this->session->get(self::SESSION_KEY, []);
     if (isset($session_data[$entity->getEntityTypeId()][$entity->bundle()]['bundle_access'])) {
@@ -95,7 +95,7 @@ class SessionBackend implements AccessStorageInterface, AccessCheckerInterface {
   /**
    * {@inheritdoc}
    */
-  public function hasUserGlobalAccess() : bool {
+  public function hasUserGlobalAccess(): bool {
     /** @var array $session_data */
     $session_data = $this->session->get(self::SESSION_KEY, []);
     if (isset($session_data['global_access'])) {

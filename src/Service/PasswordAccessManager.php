@@ -4,8 +4,8 @@ declare(strict_types = 1);
 
 namespace Drupal\entity_access_password\Service;
 
-use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 
 /**
  * Default password access manager service.
@@ -34,7 +34,7 @@ class PasswordAccessManager implements PasswordAccessManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function isEntityViewModeProtected(string $view_mode, EntityInterface $entity) : bool {
+  public function isEntityViewModeProtected(string $view_mode, EntityInterface $entity): bool {
     // Only act on fieldable entity.
     if (!$entity instanceof FieldableEntityInterface) {
       return FALSE;
@@ -48,7 +48,7 @@ class PasswordAccessManager implements PasswordAccessManagerInterface {
       /** @var array $protection_enabled_view_modes */
       $protection_enabled_view_modes = $field_definition->getSetting('view_modes');
 
-      if (!in_array($view_mode, $protection_enabled_view_modes)) {
+      if (!\in_array($view_mode, $protection_enabled_view_modes, TRUE)) {
         // Currently no support for multiple password fields on the same
         // entity. So return as soon as possible.
         return FALSE;
@@ -71,7 +71,7 @@ class PasswordAccessManager implements PasswordAccessManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function hasUserAccessToEntity(EntityInterface $entity) : bool {
+  public function hasUserAccessToEntity(EntityInterface $entity): bool {
     // Only act on fieldable entity.
     if (!$entity instanceof FieldableEntityInterface) {
       return TRUE;
@@ -93,11 +93,11 @@ class PasswordAccessManager implements PasswordAccessManagerInterface {
         return TRUE;
       }
       // Bundle password.
-      elseif ($field_instance_settings['password_bundle'] && $this->accessChecker->hasUserAccessToBundle($entity)) {
+      if ($field_instance_settings['password_bundle'] && $this->accessChecker->hasUserAccessToBundle($entity)) {
         return TRUE;
       }
       // Global password.
-      elseif ($field_instance_settings['password_global'] && $this->accessChecker->hasUserGlobalAccess()) {
+      if ($field_instance_settings['password_global'] && $this->accessChecker->hasUserGlobalAccess()) {
         return TRUE;
       }
 
@@ -120,7 +120,7 @@ class PasswordAccessManager implements PasswordAccessManagerInterface {
    * @return \Drupal\Core\Field\FieldItemListInterface[]
    *   The list of non-empty password fields.
    */
-  protected function getPasswordFields(FieldableEntityInterface $entity) : array {
+  protected function getPasswordFields(FieldableEntityInterface $entity): array {
     $password_fields = [];
     $fields = $entity->getFields();
     foreach ($fields as $field) {
