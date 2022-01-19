@@ -7,14 +7,13 @@ namespace Drupal\entity_access_password_user_data_backend\Form;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\entity_access_password_user_data_backend\Service\UserDataBackend;
 use Drupal\entity_access_password_user_data_backend\Service\UserDataBackendInterface;
 use Drupal\user\UserDataInterface;
 use Drupal\user\UserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Provides base form class to remove access (stored in user data).
+ * Provides base form class to manage access (stored in user data).
  */
 abstract class UserDataEditFormBase extends FormBase {
 
@@ -79,7 +78,7 @@ abstract class UserDataEditFormBase extends FormBase {
     $form['revoke_all'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Revoke all'),
-      '#description' => $this->t('Remove access to the users listed above.'),
+      '#description' => $this->t('Remove access to all the users listed above.'),
       '#default_value' => FALSE,
     ];
 
@@ -116,7 +115,7 @@ abstract class UserDataEditFormBase extends FormBase {
       }
 
       // User selected to have access revoked.
-      $this->userData->delete(UserDataBackend::MODULE_NAME, $user_id, $build_info['user_data_name']);
+      $this->userData->delete(UserDataBackendInterface::MODULE_NAME, $user_id, $build_info['user_data_name']);
     }
 
     // Access granting.
@@ -143,7 +142,7 @@ abstract class UserDataEditFormBase extends FormBase {
       }
 
       $grant_user_id = (int) \array_shift($grant_user_ids);
-      $this->userData->set(UserDataBackend::MODULE_NAME, $grant_user_id, $build_info['user_data_name'], TRUE);
+      $this->userData->set(UserDataBackendInterface::MODULE_NAME, $grant_user_id, $build_info['user_data_name'], TRUE);
     }
   }
 
@@ -166,7 +165,7 @@ abstract class UserDataEditFormBase extends FormBase {
    */
   protected function getUsersOptions(string $name): array {
     /** @var array $entity_access */
-    $entity_access = $this->userData->get(UserDataBackend::MODULE_NAME, NULL, $name);
+    $entity_access = $this->userData->get(UserDataBackendInterface::MODULE_NAME, NULL, $name);
 
     $uids = \array_keys($entity_access);
 

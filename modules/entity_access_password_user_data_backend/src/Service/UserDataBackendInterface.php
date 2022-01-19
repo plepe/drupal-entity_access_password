@@ -5,11 +5,13 @@ declare(strict_types = 1);
 namespace Drupal\entity_access_password_user_data_backend\Service;
 
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\entity_access_password\Service\AccessCheckerInterface;
+use Drupal\entity_access_password\Service\AccessStorageInterface;
 
 /**
  * Defines interface for user data backend services.
  */
-interface UserDataBackendInterface {
+interface UserDataBackendInterface extends AccessCheckerInterface, AccessStorageInterface {
 
   /**
    * The module name for user data storage.

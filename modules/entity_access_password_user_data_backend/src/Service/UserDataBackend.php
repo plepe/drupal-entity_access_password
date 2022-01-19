@@ -6,14 +6,12 @@ namespace Drupal\entity_access_password_user_data_backend\Service;
 
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Session\AccountProxyInterface;
-use Drupal\entity_access_password\Service\AccessCheckerInterface;
-use Drupal\entity_access_password\Service\AccessStorageInterface;
 use Drupal\user\UserDataInterface;
 
 /**
  * Handle access data in user data.
  */
-class UserDataBackend implements AccessCheckerInterface, AccessStorageInterface, UserDataBackendInterface {
+class UserDataBackend implements UserDataBackendInterface {
 
   /**
    * The current user.
