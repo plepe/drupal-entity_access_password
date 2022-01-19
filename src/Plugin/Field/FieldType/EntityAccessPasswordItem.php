@@ -160,6 +160,10 @@ class EntityAccessPasswordItem extends FieldItemBase {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $original */
     // @phpstan-ignore-next-line
     $original = $entity->original;
+    // New entity.
+    if ($original == NULL) {
+      return;
+    }
     $field_name = $this->getFieldDefinition()->getName();
 
     /** @var array $original_value */
