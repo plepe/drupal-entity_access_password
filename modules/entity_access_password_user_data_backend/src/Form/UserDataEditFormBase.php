@@ -76,6 +76,19 @@ abstract class UserDataEditFormBase extends FormBase {
       '#options' => $this->getUsersOptions($name),
     ];
 
+    $form['revoke_all'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Revoke all'),
+      '#description' => $this->t('Remove access to the users listed above.'),
+      '#default_value' => FALSE,
+    ];
+
+    $form['grant_area'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Grant access to'),
+      '#description' => $this->t('List the usernames or email addresses of the users you want to grant access to. One per line or comma separated list.'),
+    ];
+
     $form['actions'] = [
       '#type' => 'actions',
     ];
@@ -92,15 +105,44 @@ abstract class UserDataEditFormBase extends FormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) : void {
     $build_info = $form_state->getBuildInfo();
+    $revoke_all = $form_state->getValue('revoke_all');
+
+    // Access revocation.
     /** @var array $users */
     $users = $form_state->getValue('users');
     foreach ($users as $user_id => $user_display_option) {
-      if ($user_display_option === 0) {
+      if (!$revoke_all && $user_display_option === 0) {
         continue;
       }
 
       // User selected to have access revoked.
       $this->userData->delete(UserDataBackend::MODULE_NAME, $user_id, $build_info['user_data_name']);
+    }
+
+    // Access granting.
+    $grant_area = $form_state->getValue('grant_area');
+    $grant_list = explode(',', str_replace(["\r", "\n"], ',', $grant_area));
+    $user_storage = $this->entityTypeManager->getStorage('user');
+    foreach ($grant_list as $user_name_or_email) {
+      $user_name_or_email = trim($user_name_or_email);
+      if (empty($user_name_or_email)) {
+        continue;
+      }
+
+      $grant_user_ids = $user_storage->getQuery('OR')
+        ->condition('name', $user_name_or_email)
+        ->condition('mail', $user_name_or_email)
+        ->execute();
+
+      if (empty($grant_user_ids)) {
+        $this->messenger()->addWarning($this->t('No user found for the username or email address: @text.', [
+          '@text' => $user_name_or_email,
+        ]));
+        continue;
+      }
+
+      $grant_user_id = array_shift($grant_user_ids);
+      $this->userData->set(UserDataBackend::MODULE_NAME, $grant_user_id, $build_info['user_data_name'], TRUE);
     }
   }
 
