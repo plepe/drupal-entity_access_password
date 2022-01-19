@@ -4,8 +4,6 @@ declare(strict_types = 1);
 
 namespace Drupal\entity_access_password_user_data_backend\Form;
 
-use Drupal\entity_access_password_user_data_backend\Service\UserDataBackend;
-
 /**
  * Provides form to remove access (stored in user data) to the bundle.
  */
@@ -29,7 +27,7 @@ class BundleUserDataEditForm extends UserDataEditFormBase {
       return '';
     }
 
-    return sprintf(UserDataBackend::BUNDLE_NAME_KEY, $entity_type_id, $bundle_id);
+    return $this->userDataBackend->getBundleName($entity_type_id, $bundle_id);
   }
 
 }

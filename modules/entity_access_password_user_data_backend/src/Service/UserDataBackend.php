@@ -13,27 +13,7 @@ use Drupal\user\UserDataInterface;
 /**
  * Handle access data in user data.
  */
-class UserDataBackend implements AccessStorageInterface, AccessCheckerInterface {
-
-  /**
-   * The module name for user data storage.
-   */
-  public const MODULE_NAME = 'entity_access_password_user_data_backend';
-
-  /**
-   * Name key for entity access (entity_type_id||entity_uuid).
-   */
-  public const ENTITY_NAME_KEY = '%s||%s';
-
-  /**
-   * Name key for entity bundle access (entity_type_id||entity_bundle).
-   */
-  public const BUNDLE_NAME_KEY = '%s||%s';
-
-  /**
-   * Name key for global access.
-   */
-  public const GLOBAL_NAME_KEY = 'global';
+class UserDataBackend implements AccessStorageInterface, AccessCheckerInterface, UserDataBackendInterface {
 
   /**
    * The current user.
@@ -74,8 +54,7 @@ class UserDataBackend implements AccessStorageInterface, AccessCheckerInterface 
       return;
     }
 
-    $name = sprintf(self::ENTITY_NAME_KEY, $entity->getEntityTypeId(), $entity->uuid());
-    $this->userData->set(self::MODULE_NAME, $this->currentUser->id(), $name, TRUE);
+    $this->userData->set(self::MODULE_NAME, $this->currentUser->id(), $this->getEntityName($entity), TRUE);
   }
 
   /**
@@ -87,8 +66,7 @@ class UserDataBackend implements AccessStorageInterface, AccessCheckerInterface 
       return;
     }
 
-    $name = sprintf(self::BUNDLE_NAME_KEY, $entity->getEntityTypeId(), $entity->bundle());
-    $this->userData->set(self::MODULE_NAME, $this->currentUser->id(), $name, TRUE);
+    $this->userData->set(self::MODULE_NAME, $this->currentUser->id(), $this->getBundleNameFromEntity($entity), TRUE);
   }
 
   /**
@@ -100,7 +78,7 @@ class UserDataBackend implements AccessStorageInterface, AccessCheckerInterface 
       return;
     }
 
-    $this->userData->set(self::MODULE_NAME, $this->currentUser->id(), self::GLOBAL_NAME_KEY, TRUE);
+    $this->userData->set(self::MODULE_NAME, $this->currentUser->id(), $this->getGlobalName(), TRUE);
   }
 
   /**
@@ -112,8 +90,7 @@ class UserDataBackend implements AccessStorageInterface, AccessCheckerInterface 
       return FALSE;
     }
 
-    $name = sprintf(self::ENTITY_NAME_KEY, $entity->getEntityTypeId(), $entity->uuid());
-    $has_entity_access = $this->userData->get(self::MODULE_NAME, $this->currentUser->id(), $name);
+    $has_entity_access = $this->userData->get(self::MODULE_NAME, $this->currentUser->id(), $this->getEntityName($entity));
     if ($has_entity_access) {
       return TRUE;
     }
@@ -130,8 +107,7 @@ class UserDataBackend implements AccessStorageInterface, AccessCheckerInterface 
       return FALSE;
     }
 
-    $name = sprintf(self::BUNDLE_NAME_KEY, $entity->getEntityTypeId(), $entity->bundle());
-    $has_bundle_access = $this->userData->get(self::MODULE_NAME, $this->currentUser->id(), $name);
+    $has_bundle_access = $this->userData->get(self::MODULE_NAME, $this->currentUser->id(), $this->getBundleNameFromEntity($entity));
     if ($has_bundle_access) {
       return TRUE;
     }
@@ -148,12 +124,40 @@ class UserDataBackend implements AccessStorageInterface, AccessCheckerInterface 
       return FALSE;
     }
 
-    $has_global_access = $this->userData->get(self::MODULE_NAME, $this->currentUser->id(), self::GLOBAL_NAME_KEY);
+    $has_global_access = $this->userData->get(self::MODULE_NAME, $this->currentUser->id(), $this->getGlobalName());
     if ($has_global_access) {
       return TRUE;
     }
 
     return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEntityName(FieldableEntityInterface $entity) : string {
+    return sprintf(self::ENTITY_NAME_KEY, $entity->getEntityTypeId(), $entity->uuid());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBundleName(string $entityTypeId, string $bundleId) : string {
+    return sprintf(self::BUNDLE_NAME_KEY, $entityTypeId, $bundleId);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBundleNameFromEntity(FieldableEntityInterface $entity) : string {
+    return sprintf(self::BUNDLE_NAME_KEY, $entity->getEntityTypeId(), $entity->bundle());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getGlobalName() : string {
+    return self::GLOBAL_NAME_KEY;
   }
 
 }

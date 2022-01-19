@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\entity_access_password_user_data_backend\Service\UserDataBackend;
+use Drupal\entity_access_password_user_data_backend\Service\UserDataBackendInterface;
 use Drupal\user\UserDataInterface;
 use Drupal\user\UserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -32,12 +33,20 @@ abstract class UserDataEditFormBase extends FormBase {
   protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
+   * The user data backend.
+   *
+   * @var \Drupal\entity_access_password_user_data_backend\Service\UserDataBackendInterface
+   */
+  protected UserDataBackendInterface $userDataBackend;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) : self {
     $instance = parent::create($container);
     $instance->userData = $container->get('user.data');
     $instance->entityTypeManager = $container->get('entity_type.manager');
+    $instance->userDataBackend = $container->get('entity_access_password_user_data_backend.user_data_backend');
     return $instance;
   }
 

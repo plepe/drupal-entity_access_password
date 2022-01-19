@@ -6,7 +6,6 @@ namespace Drupal\entity_access_password_user_data_backend\Form;
 
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\entity_access_password_user_data_backend\Service\UserDataBackend;
 
 /**
  * Provides form to remove access (stored in user data) to the entity.
@@ -23,7 +22,7 @@ class EntityUserDataEditForm extends UserDataEditFormBase {
     if (!$entity instanceof FieldableEntityInterface) {
       return '';
     }
-    return sprintf(UserDataBackend::ENTITY_NAME_KEY, $entity->getEntityTypeId(), $entity->uuid());
+    return $this->userDataBackend->getEntityName($entity);
   }
 
   /**
