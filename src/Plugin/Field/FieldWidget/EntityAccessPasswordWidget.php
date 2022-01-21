@@ -186,8 +186,12 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
       ];
       $element['password_wrapper']['password_confirm_wrapper']['password'] = [
         '#type' => 'password_confirm',
-        '#description' => $this->t('If left empty will not overwrite current password (if any).'),
       ];
+
+      if (isset($items[$delta]->password) && !empty($items[$delta]->password)) {
+        $element['password_wrapper']['password_confirm_wrapper']['password']['#description'] = $this->t('If left empty will not overwrite the current password.');
+        $element['password_wrapper']['password_confirm_wrapper']['password']['#after_build'][] = [static::class, 'passwordConfirmExistingPassword'];
+      }
     }
 
     $show_entity_title_setting = $this->getSetting('show_entity_title');
@@ -353,6 +357,25 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
       $selector = $root . '[' . \implode('][', $parents) . ']';
     }
     return $selector;
+  }
+
+  /**
+   * Alter the password confirm to show that a password is already set.
+   *
+   * @param array $element
+   *   The element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   *
+   * @return array
+   *   The altered form element.
+   */
+  public static function passwordConfirmExistingPassword(array $element, FormStateInterface $form_state): array {
+    $element['pass1']['#title'] = $element['pass1']['#title'] . ' (' . \t('already exists') . ')';
+    $element['pass1']['#attributes'] = [
+      'placeholder' => '********',
+    ];
+    return $element;
   }
 
 }
