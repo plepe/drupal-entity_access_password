@@ -153,7 +153,7 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
     if ($this->getFieldSetting('password_entity')) {
       // Allows password confirm states to depend only on the random password
       // checkbox.
-      $element['password_wrapper'] = [
+      $element['protected_wrapper'] = [
         '#type' => 'container',
         '#states' => [
           'invisible' => [
@@ -164,8 +164,27 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
         ],
       ];
 
+      if (isset($items[$delta]->password) && !empty($items[$delta]->password)) {
+        $element['protected_wrapper']['change_existing'] = [
+          '#type' => 'checkbox',
+          '#title' => $this->t('Update existing password'),
+          '#default_value' => FALSE,
+        ];
+      }
+
+      $element['protected_wrapper']['change_existing_wrapper'] = [
+        '#type' => 'container',
+        '#states' => [
+          'invisible' => [
+            ':input[name="' . $states_selector . '[' . $delta . '][protected_wrapper][change_existing]"]' => [
+              'checked' => FALSE,
+            ],
+          ],
+        ],
+      ];
+
       if ($this->getSetting('allow_random_password')) {
-        $element['password_wrapper']['random_password'] = [
+        $element['protected_wrapper']['change_existing_wrapper']['random_password'] = [
           '#type' => 'checkbox',
           '#title' => $this->t('Generate random password'),
           '#default_value' => FALSE,
@@ -174,23 +193,22 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
 
       // Need to wrap password confirm for #states to work.
       // @see https://www.drupal.org/project/drupal/issues/1427838.
-      $element['password_wrapper']['password_confirm_wrapper'] = [
+      $element['protected_wrapper']['change_existing_wrapper']['password_confirm_wrapper'] = [
         '#type' => 'container',
         '#states' => [
           'invisible' => [
-            ':input[name="' . $states_selector . '[' . $delta . '][password_wrapper][random_password]"]' => [
+            ':input[name="' . $states_selector . '[' . $delta . '][protected_wrapper][change_existing_wrapper][random_password]"]' => [
               'checked' => TRUE,
             ],
           ],
         ],
       ];
-      $element['password_wrapper']['password_confirm_wrapper']['password'] = [
+      $element['protected_wrapper']['change_existing_wrapper']['password_confirm_wrapper']['password'] = [
         '#type' => 'password_confirm',
       ];
 
       if (isset($items[$delta]->password) && !empty($items[$delta]->password)) {
-        $element['password_wrapper']['password_confirm_wrapper']['password']['#description'] = $this->t('If left empty will not overwrite the current password.');
-        $element['password_wrapper']['password_confirm_wrapper']['password']['#after_build'][] = [static::class, 'passwordConfirmExistingPassword'];
+        $element['protected_wrapper']['change_existing_wrapper']['password_confirm_wrapper']['password']['#description'] = $this->t('If left empty will not overwrite the current password.');
       }
     }
 
@@ -269,14 +287,14 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state): array {
     foreach ($values as &$value) {
       // Entity password is not enabled.
-      if (!isset($value['password_wrapper'])) {
+      if (!isset($value['protected_wrapper'])) {
         continue;
       }
 
-      $password = $value['password_wrapper']['password_confirm_wrapper']['password'];
+      $password = $value['protected_wrapper']['change_existing_wrapper']['password_confirm_wrapper']['password'];
 
       // Random password.
-      if (isset($value['password_wrapper']['random_password']) && $value['password_wrapper']['random_password']) {
+      if (isset($value['protected_wrapper']['change_existing_wrapper']['random_password']) && $value['protected_wrapper']['change_existing_wrapper']['random_password']) {
         $global_settings = $this->configFactory->get(SettingsForm::CONFIG_NAME);
         /** @var int $random_password_length */
         $random_password_length = $global_settings->get('random_password_length');
@@ -297,7 +315,7 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
       }
 
       // Cleanup.
-      unset($value['password_wrapper']);
+      unset($value['protected_wrapper']);
     }
     return $values;
   }
@@ -357,25 +375,6 @@ class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryP
       $selector = $root . '[' . \implode('][', $parents) . ']';
     }
     return $selector;
-  }
-
-  /**
-   * Alter the password confirm to show that a password is already set.
-   *
-   * @param array $element
-   *   The element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state.
-   *
-   * @return array
-   *   The altered form element.
-   */
-  public static function passwordConfirmExistingPassword(array $element, FormStateInterface $form_state): array {
-    $element['pass1']['#title'] = $element['pass1']['#title'] . ' (' . \t('already exists') . ')';
-    $element['pass1']['#attributes'] = [
-      'placeholder' => '********',
-    ];
-    return $element;
   }
 
 }

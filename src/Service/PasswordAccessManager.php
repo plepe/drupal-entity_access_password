@@ -106,8 +106,7 @@ class PasswordAccessManager implements PasswordAccessManagerInterface {
       return FALSE;
     }
 
-    // This should not happen, but in case this method is called on an entity
-    // without password fields.
+    // In case this method is called on an entity without password fields.
     return TRUE;
   }
 
