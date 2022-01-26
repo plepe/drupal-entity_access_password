@@ -16,6 +16,9 @@ use Drupal\entity_access_password\Service\PasswordAccessManagerInterface;
  * Calculated cache context ID:
  * 'entity_access_password_entity_is_protected:%entity_type_id||%entity_id||%view_mode',
  * e.g. 'entity_access_password_entity_is_protected:node||42||teaser'.
+ * Or
+ * 'entity_access_password_entity_is_protected:%entity_type_id||%entity_id',
+ * e.g. 'entity_access_password_entity_is_protected:node||42'.
  */
 class EntityIsProtectedCacheContext implements CalculatedCacheContextInterface {
 
@@ -87,18 +90,43 @@ class EntityIsProtectedCacheContext implements CalculatedCacheContextInterface {
       return $this->processedEntries[$entity_info]['context_value'];
     }
 
-    $entity = $this->loadEntity($entity_info);
-    if ($entity == NULL) {
-      $this->processedEntries[$entity_info]['context_value'] = '0';
-      return $this->processedEntries[$entity_info]['context_value'];
-    }
+    // There should be at least 2 parts.
     $parsed_entity_info = \explode('||', $entity_info);
-    $view_mode = $parsed_entity_info[self::VIEW_MODE_POSITION];
+    switch (\count($parsed_entity_info)) {
+      case (int) 2:
+        $entity_type_id = $parsed_entity_info[0];
+        $entity_id = $parsed_entity_info[1];
+        $entity = $this->loadEntity($entity_type_id, $entity_id);
+        if ($entity == NULL) {
+          $this->processedEntries[$entity_info]['context_value'] = '0';
+          return $this->processedEntries[$entity_info]['context_value'];
+        }
+        // Entity is not protected.
+        if (!$this->passwordAccessManager->isEntityLabelProtected($entity)) {
+          $this->processedEntries[$entity_info]['context_value'] = '0';
+          return $this->processedEntries[$entity_info]['context_value'];
+        }
+        break;
 
-    // Entity view mode is not protected.
-    if (!$this->passwordAccessManager->isEntityViewModeProtected($view_mode, $entity)) {
-      $this->processedEntries[$entity_info]['context_value'] = '0';
-      return $this->processedEntries[$entity_info]['context_value'];
+      case (int) 3:
+        $entity_type_id = $parsed_entity_info[0];
+        $entity_id = $parsed_entity_info[1];
+        $view_mode = $parsed_entity_info[self::VIEW_MODE_POSITION];
+        $entity = $this->loadEntity($entity_type_id, $entity_id);
+        if ($entity == NULL) {
+          $this->processedEntries[$entity_info]['context_value'] = '0';
+          return $this->processedEntries[$entity_info]['context_value'];
+        }
+        // Entity view mode is not protected.
+        if (!$this->passwordAccessManager->isEntityViewModeProtected($view_mode, $entity)) {
+          $this->processedEntries[$entity_info]['context_value'] = '0';
+          return $this->processedEntries[$entity_info]['context_value'];
+        }
+        break;
+
+      default:
+        $this->processedEntries[$entity_info]['context_value'] = '0';
+        return $this->processedEntries[$entity_info]['context_value'];
     }
 
     // User has access.
@@ -124,7 +152,15 @@ class EntityIsProtectedCacheContext implements CalculatedCacheContextInterface {
     if ($entity_info === NULL) {
       return $this->processedEntries[$entity_info]['cacheable_metadata'];
     }
-    $entity = $this->loadEntity($entity_info);
+
+    $parsed_entity_info = \explode('||', $entity_info);
+    if (\count($parsed_entity_info) < (int) 2) {
+      return $this->processedEntries[$entity_info]['cacheable_metadata'];
+    }
+
+    $entity_type_id = $parsed_entity_info[0];
+    $entity_id = $parsed_entity_info[1];
+    $entity = $this->loadEntity($entity_type_id, $entity_id);
     if ($entity == NULL) {
       return $this->processedEntries[$entity_info]['cacheable_metadata'];
     }
@@ -136,20 +172,15 @@ class EntityIsProtectedCacheContext implements CalculatedCacheContextInterface {
   /**
    * Load the fieldable entity if possible.
    *
-   * @param string $entity_info
-   *   The cache context parameter.
+   * @param string $entity_type_id
+   *   The entity type ID.
+   * @param string $entity_id
+   *   The entity ID.
    *
    * @return \Drupal\Core\Entity\FieldableEntityInterface|null
    *   The fieldable entity if found. NULL otherwise.
    */
-  protected function loadEntity(string $entity_info) {
-    $entity_info = \explode('||', $entity_info);
-    if (\count($entity_info) != (int) 3) {
-      return NULL;
-    }
-    $entity_type_id = $entity_info[0];
-    $entity_id = $entity_info[1];
-
+  protected function loadEntity(string $entity_type_id, string $entity_id) {
     try {
       $entity_storage = $this->entityTypeManager->getStorage($entity_type_id);
     }

@@ -71,6 +71,33 @@ class PasswordAccessManager implements PasswordAccessManagerInterface {
   /**
    * {@inheritdoc}
    */
+  public function isEntityLabelProtected(EntityInterface $entity): bool {
+    // Only act on fieldable entity.
+    if (!$entity instanceof FieldableEntityInterface) {
+      return FALSE;
+    }
+
+    // Search if there is a password field where the entity is protected.
+    $password_fields = $this->getPasswordFields($entity);
+    foreach ($password_fields as $password_field) {
+      /** @var array $field_values */
+      $field_values = $password_field->getValue();
+
+      if ($field_values[0]['is_protected'] && !$field_values[0]['show_title']) {
+        return TRUE;
+      }
+
+      // Currently no support for multiple password fields on the same
+      // entity. So return as soon as possible.
+      return FALSE;
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function hasUserAccessToEntity(EntityInterface $entity): bool {
     // Only act on fieldable entity.
     if (!$entity instanceof FieldableEntityInterface) {

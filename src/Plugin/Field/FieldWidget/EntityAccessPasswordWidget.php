@@ -10,7 +10,6 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Password\PasswordInterface;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\entity_access_password\Form\SettingsForm;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -23,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     field_types = {"entity_access_password_password"},
  * )
  */
-class EntityAccessPasswordWidget extends WidgetBase implements ContainerFactoryPluginInterface {
+class EntityAccessPasswordWidget extends WidgetBase {
 
   /**
    * The password hashing service object.

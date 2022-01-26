@@ -30,6 +30,17 @@ interface PasswordAccessManagerInterface {
   public function isEntityViewModeProtected(string $view_mode, EntityInterface $entity): bool;
 
   /**
+   * Check if an entity label is protected.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity to check access for.
+   *
+   * @return bool
+   *   TRUE if protected. FALSE otherwise.
+   */
+  public function isEntityLabelProtected(EntityInterface $entity): bool;
+
+  /**
    * Check if the current user has access to the entity.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
