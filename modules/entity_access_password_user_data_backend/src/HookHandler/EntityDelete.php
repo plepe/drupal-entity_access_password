@@ -40,7 +40,7 @@ class EntityDelete implements ContainerInjectionInterface {
    */
   public function __construct(
     UserDataInterface $userData,
-    UserDataBackendInterface $userDataBackend,
+    UserDataBackendInterface $userDataBackend
   ) {
     $this->userData = $userData;
     $this->userDataBackend = $userDataBackend;
