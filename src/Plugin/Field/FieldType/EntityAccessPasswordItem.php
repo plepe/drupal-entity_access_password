@@ -130,7 +130,7 @@ class EntityAccessPasswordItem extends FieldItemBase {
    * {@inheritdoc}
    */
   public function isEmpty(): bool {
-    $is_protected = $this->get('is_protected')->getValue();
+    $is_protected = (bool) $this->get('is_protected')->getValue();
     $password = $this->get('password')->getValue();
     $hint = $this->get('hint')->getValue();
     if ($is_protected === TRUE) {

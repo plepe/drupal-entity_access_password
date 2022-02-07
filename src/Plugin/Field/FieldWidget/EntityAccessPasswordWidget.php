@@ -144,12 +144,13 @@ class EntityAccessPasswordWidget extends WidgetBase {
     $element['is_protected'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Enable password protection'),
-      '#default_value' => isset($items[$delta]->is_protected) ? $items[$delta]->is_protected : $element['#required'] ?? FALSE,
+      '#default_value' => $items[$delta]->is_protected ?? $element['#required'] ?? FALSE,
       '#required' => $element['#required'],
     ];
 
     // Show entity password only if enabled.
     if ($this->getFieldSetting('password_entity')) {
+      $password_already_set = (isset($items[$delta]->password) && !empty($items[$delta]->password));
       // Allows password confirm states to depend only on the random password
       // checkbox.
       $element['protected_wrapper'] = [
@@ -163,7 +164,7 @@ class EntityAccessPasswordWidget extends WidgetBase {
         ],
       ];
 
-      if (isset($items[$delta]->password) && !empty($items[$delta]->password)) {
+      if ($password_already_set) {
         $element['protected_wrapper']['change_existing'] = [
           '#type' => 'checkbox',
           '#title' => $this->t('Update existing password'),
@@ -185,7 +186,7 @@ class EntityAccessPasswordWidget extends WidgetBase {
       if ($this->getSetting('allow_random_password')) {
         $element['protected_wrapper']['change_existing_wrapper']['random_password'] = [
           '#type' => 'checkbox',
-          '#title' => $this->t('Generate random password'),
+          '#title' => $password_already_set ? $this->t('Generate random password (will replace the existing password)') : $this->t('Generate random password'),
           '#default_value' => FALSE,
         ];
       }
@@ -206,8 +207,12 @@ class EntityAccessPasswordWidget extends WidgetBase {
         '#type' => 'password_confirm',
       ];
 
-      if (isset($items[$delta]->password) && !empty($items[$delta]->password)) {
+      if ($password_already_set) {
         $element['protected_wrapper']['change_existing_wrapper']['password_confirm_wrapper']['password']['#description'] = $this->t('If left empty will not overwrite the current password.');
+        $element['protected_wrapper']['change_existing_wrapper']['password_confirm_wrapper']['password']['#after_build'][] = [
+          static::class,
+          'passwordConfirmExistingPassword',
+        ];
       }
     }
 
@@ -224,7 +229,7 @@ class EntityAccessPasswordWidget extends WidgetBase {
         $element['show_title'] = [
           '#type' => 'checkbox',
           '#title' => $this->t('Show entity title'),
-          '#default_value' => isset($items[$delta]->show_title) ? $items[$delta]->show_title : FALSE,
+          '#default_value' => $items[$delta]->show_title ?? FALSE,
           '#states' => [
             'invisible' => [
               ':input[name="' . $states_selector . '[' . $delta . '][is_protected]"]' => [
@@ -254,7 +259,7 @@ class EntityAccessPasswordWidget extends WidgetBase {
       $element['hint'] = [
         '#type' => 'textarea',
         '#title' => $this->t('Password hint'),
-        '#default_value' => isset($items[$delta]->hint) ? $items[$delta]->hint : '',
+        '#default_value' => $items[$delta]->hint ?? '',
         '#required' => ($element['#required'] && $show_hint_setting === 'always'),
         '#states' => [
           'invisible' => [
@@ -374,6 +379,25 @@ class EntityAccessPasswordWidget extends WidgetBase {
       $selector = $root . '[' . \implode('][', $parents) . ']';
     }
     return $selector;
+  }
+
+  /**
+   * Alter the password confirm to show that a password is already set.
+   *
+   * @param array $element
+   *   The element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   *
+   * @return array
+   *   The altered form element.
+   */
+  public static function passwordConfirmExistingPassword(array $element, FormStateInterface $form_state): array {
+    $element['pass1']['#title'] = $element['pass1']['#title'] . ' (' . \t('a password is already set') . ')';
+    $element['pass1']['#attributes'] = [
+      'placeholder' => '********',
+    ];
+    return $element;
   }
 
 }
