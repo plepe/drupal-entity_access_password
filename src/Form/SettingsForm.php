@@ -63,7 +63,7 @@ class SettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
-    $config = $this->config('entity_access_password.settings');
+    $config = $this->config(self::CONFIG_NAME);
 
     $form['global_password'] = [
       '#type' => 'password_confirm',
@@ -92,7 +92,7 @@ class SettingsForm extends ConfigFormBase {
     /** @var string $password */
     $password = $form_state->getValue('global_password');
 
-    $config = $this->config('entity_access_password.settings');
+    $config = $this->config(self::CONFIG_NAME);
     if ($password) {
       $config->set('global_password', $this->password->hash($password));
     }
