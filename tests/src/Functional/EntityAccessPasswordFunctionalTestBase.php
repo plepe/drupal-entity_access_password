@@ -68,6 +68,7 @@ abstract class EntityAccessPasswordFunctionalTestBase extends BrowserTestBase {
   protected array $adminUserPermissions = [
     'administer_entity_access_password',
     'bypass_password_protection',
+    'bypass node access',
     'access content',
   ];
 
