@@ -6,6 +6,7 @@ namespace Drupal\Tests\entity_access_password\Functional;
 
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Password\PasswordInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\entity_access_password\Form\SettingsForm;
 use Drupal\entity_access_password\Service\PasswordAccessManagerInterface;
 use Drupal\field\Entity\FieldConfig;
@@ -18,6 +19,7 @@ use Drupal\user\UserInterface;
  * Provides helper methods for the EAP module's functional tests.
  */
 abstract class EntityAccessPasswordFunctionalTestBase extends BrowserTestBase {
+  use StringTranslationTrait;
 
   /**
    * The global password used for tests.
@@ -350,6 +352,14 @@ abstract class EntityAccessPasswordFunctionalTestBase extends BrowserTestBase {
         'hint' => 'Hint bundle',
         'password' => '',
       ],
+      'bundle_2' => [
+        'type' => 'eap_bundle',
+        'title' => 'Node 2 bundle',
+        'is_protected' => TRUE,
+        'show_title' => TRUE,
+        'hint' => 'Hint 2 bundle',
+        'password' => '',
+      ],
       'entity' => [
         'type' => 'eap_entity',
         'title' => 'Node entity',
@@ -390,10 +400,76 @@ abstract class EntityAccessPasswordFunctionalTestBase extends BrowserTestBase {
           'is_protected' => $structure['is_protected'],
           'show_title' => $structure['show_title'],
           'hint' => $structure['hint'],
-          'password' => $structure['password'],
+          'password' => empty($structure['password']) ? '' : $this->password->hash($structure['password']),
         ],
       ]);
     }
+  }
+
+  /**
+   * Get the node password.
+   *
+   * @param string $key
+   *   The node key in the $this->protectedNodesStructure.
+   *
+   * @return string
+   *   The password of the node.
+   */
+  protected function getNodePassword(string $key): string {
+    switch ($key) {
+      case 'global':
+        return self::TESTS_GLOBAL_PASSWORD;
+
+      case 'bundle':
+      case 'bundle_2':
+        return self::TESTS_BUNDLE_PASSWORD;
+
+      default:
+        return self::TESTS_ENTITY_PASSWORD;
+    }
+  }
+
+  /**
+   * Enter a node password.
+   *
+   * @param string $key
+   *   The node key in the $this->protectedNodesStructure.
+   */
+  protected function enterNodePassword(string $key): void {
+    $node = $this->protectedNodes[$key];
+    $this->drupalGet($node->toUrl());
+    $this->passwordFormIsDisplayed($key);
+
+    $entered_password = $this->getNodePassword($key);
+    $this->submitForm(
+      ['form_password' => $entered_password],
+      $this->t('Submit'),
+      'entity-access-password-password-node-' . $node->id()
+    );
+
+    $this->passwordFormIsNotDisplayed($key);
+  }
+
+  /**
+   * Check if that the password form is displayed.
+   *
+   * @param string $key
+   *   The node key in the $this->protectedNodesStructure.
+   */
+  protected function passwordFormIsDisplayed(string $key): void {
+    $this->assertSession()->pageTextContains('Help text: ' . $this->protectedNodesStructure[$key]['type']);
+    $this->assertSession()->pageTextContains($this->protectedNodesStructure[$key]['hint']);
+  }
+
+  /**
+   * Check if that the password form is not displayed.
+   *
+   * @param string $key
+   *   The node key in the $this->protectedNodesStructure.
+   */
+  protected function passwordFormIsNotDisplayed(string $key): void {
+    $this->assertSession()->pageTextNotContains('Help text: ' . $this->protectedNodesStructure[$key]['type']);
+    $this->assertSession()->pageTextNotContains($this->protectedNodesStructure[$key]['hint']);
   }
 
 }

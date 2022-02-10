@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\entity_access_password\Functional;
 
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Utility\Token;
 use Drupal\user\UserInterface;
 
@@ -14,7 +13,6 @@ use Drupal\user\UserInterface;
  * @group entity_access_password
  */
 class GlobalBehaviorsTest extends EntityAccessPasswordFunctionalTestBase {
-  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
@@ -75,8 +73,7 @@ class GlobalBehaviorsTest extends EntityAccessPasswordFunctionalTestBase {
     $this->drupalLogin($this->bypassPasswordUser);
     foreach ($this->protectedNodes as $key => $node) {
       $this->drupalGet($node->toUrl());
-      $this->assertSession()->pageTextNotContains('Help text: ' . $this->protectedNodesStructure[$key]['type']);
-      $this->assertSession()->pageTextNotContains($this->protectedNodesStructure[$key]['hint']);
+      $this->passwordFormIsNotDisplayed($key);
     }
 
     $this->drupalLogin($this->user);
@@ -84,8 +81,7 @@ class GlobalBehaviorsTest extends EntityAccessPasswordFunctionalTestBase {
     // Test that hint and help texts are displayed on the password form.
     foreach ($this->protectedNodes as $key => $node) {
       $this->drupalGet($node->toUrl());
-      $this->assertSession()->pageTextContains('Help text: ' . $this->protectedNodesStructure[$key]['type']);
-      $this->assertSession()->pageTextContains($this->protectedNodesStructure[$key]['hint']);
+      $this->passwordFormIsDisplayed($key);
     }
 
     // Test that it is possible to protect view modes other than the full one.
@@ -93,8 +89,7 @@ class GlobalBehaviorsTest extends EntityAccessPasswordFunctionalTestBase {
     // list.
     $this->drupalGet(self::TEST_CONTROLLER_PATH);
     foreach (\array_keys($this->protectedNodes) as $key) {
-      $this->assertSession()->pageTextContains('Help text: ' . $this->protectedNodesStructure[$key]['type']);
-      $this->assertSession()->pageTextContains($this->protectedNodesStructure[$key]['hint']);
+      $this->passwordFormIsDisplayed($key);
     }
 
     // Test the hide title feature.
