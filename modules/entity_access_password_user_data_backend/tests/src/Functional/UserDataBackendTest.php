@@ -50,6 +50,42 @@ class UserDataBackendTest extends BackendTestBase {
   /**
    * {@inheritdoc}
    */
+  public function testBackend(): void {
+    parent::testBackend();
+
+    $node_keys = [
+      'global',
+      'bundle',
+      'entity',
+    ];
+
+    $this->resetAllAccesses($this->user);
+    // Test that the access is persisted when changing the session.
+    $this->drupalLogin($this->user);
+    foreach ($node_keys as $key) {
+      $this->enterNodePassword($key);
+    }
+    $this->drupalLogout();
+    $this->drupalLogin($this->user);
+
+    foreach ($node_keys as $key) {
+      $node = $this->protectedNodes[$key];
+      $this->drupalGet($node->toUrl());
+      $this->passwordFormIsNotDisplayed($key);
+    }
+
+    // Test that the user data backend does not store access for anonymous
+    // users. The password form should still be displayed even after entering
+    // the correct password.
+    $this->drupalLogout();
+    foreach ($node_keys as $key) {
+      $this->enterNodePassword($key, [TRUE, TRUE]);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function resetAllAccesses(UserInterface $user): void {
     /** @var int $user_id */
     $user_id = $user->id();

@@ -23,7 +23,6 @@ abstract class BackendTestBase extends EntityAccessPasswordFunctionalTestBase {
     $this->enterNodePassword('entity');
 
     $this->resetAllAccesses($this->user);
-    $this->drupalLogin($this->user);
 
     // Test combinations of access levels.
     $node_all_1 = $this->protectedNodes['all'];
@@ -49,7 +48,6 @@ abstract class BackendTestBase extends EntityAccessPasswordFunctionalTestBase {
 
     // Reset before global access checks.
     $this->resetAllAccesses($this->user);
-    $this->drupalLogin($this->user);
 
     // Global level.
     $this->drupalGet($node_all_1->toUrl());

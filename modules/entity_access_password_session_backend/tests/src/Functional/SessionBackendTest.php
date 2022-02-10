@@ -27,6 +27,7 @@ class SessionBackendTest extends BackendTestBase {
    */
   protected function resetAllAccesses(UserInterface $user): void {
     $this->drupalLogout();
+    $this->drupalLogin($user);
   }
 
 }

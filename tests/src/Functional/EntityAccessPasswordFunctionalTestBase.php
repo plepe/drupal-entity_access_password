@@ -434,11 +434,22 @@ abstract class EntityAccessPasswordFunctionalTestBase extends BrowserTestBase {
    *
    * @param string $key
    *   The node key in the $this->protectedNodesStructure.
+   * @param array $formExpectations
+   *   If the form should be present before and after submission.
    */
-  protected function enterNodePassword(string $key): void {
+  protected function enterNodePassword(string $key, array $formExpectations = [
+    TRUE,
+    FALSE,
+  ]): void {
     $node = $this->protectedNodes[$key];
     $this->drupalGet($node->toUrl());
-    $this->passwordFormIsDisplayed($key);
+
+    if (\array_shift($formExpectations)) {
+      $this->passwordFormIsDisplayed($key);
+    }
+    else {
+      $this->passwordFormIsNotDisplayed($key);
+    }
 
     $entered_password = $this->getNodePassword($key);
     $this->submitForm(
@@ -447,7 +458,12 @@ abstract class EntityAccessPasswordFunctionalTestBase extends BrowserTestBase {
       'entity-access-password-password-node-' . $node->id()
     );
 
-    $this->passwordFormIsNotDisplayed($key);
+    if (\array_shift($formExpectations)) {
+      $this->passwordFormIsDisplayed($key);
+    }
+    else {
+      $this->passwordFormIsNotDisplayed($key);
+    }
   }
 
   /**
