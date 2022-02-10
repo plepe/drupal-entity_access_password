@@ -139,6 +139,9 @@ class LabelReplacer implements ContainerInjectionInterface {
 
     if ($replacement != NULL) {
       $variables['label'][0]['#context']['value'] = $replacement;
+      // In case the label has already been rendered, ensure replacement is
+      // taken into account.
+      $variables['label']['#printed'] = FALSE;
     }
 
     $cacheableMetadata->applyTo($variables);
@@ -163,6 +166,9 @@ class LabelReplacer implements ContainerInjectionInterface {
 
     if ($replacement != NULL) {
       $variables['name'][0]['#context']['value'] = $replacement;
+      // In case the name has already been rendered, ensure replacement is
+      // taken into account.
+      $variables['name']['#printed'] = FALSE;
     }
 
     $cacheableMetadata->applyTo($variables);
