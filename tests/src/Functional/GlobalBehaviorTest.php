@@ -42,14 +42,6 @@ class GlobalBehaviorTest extends EntityAccessPasswordFunctionalTestBase {
    * Test that hint and help texts are displayed on the password form.
    */
   public function testGlobalBehavior(): void {
-    // Test that hint and help texts are displayed on the password form.
-    $this->drupalLogin($this->user);
-    foreach ($this->protectedNodes as $key => $node) {
-      $this->drupalGet($node->toUrl());
-      $this->assertSession()->pageTextContains('Help text: ' . $this->protectedNodesStructure[$key]['type']);
-      $this->assertSession()->pageTextContains($this->protectedNodesStructure[$key]['hint']);
-    }
-
     // Test that a password with bypass permission can access the content
     // directly, so no password form, hence no help and hint texts.
     $this->drupalLogin($this->bypassPasswordUser);
@@ -58,14 +50,25 @@ class GlobalBehaviorTest extends EntityAccessPasswordFunctionalTestBase {
       $this->assertSession()->pageTextNotContains('Help text: ' . $this->protectedNodesStructure[$key]['type']);
       $this->assertSession()->pageTextNotContains($this->protectedNodesStructure[$key]['hint']);
     }
-  }
 
-  /**
-   * Test that it is possible to protect view modes other than the full one.
-   */
-//  public function testProtectedViewModes(): void {
-//
-//  }
+    $this->drupalLogin($this->user);
+
+    // Test that hint and help texts are displayed on the password form.
+    foreach ($this->protectedNodes as $key => $node) {
+      $this->drupalGet($node->toUrl());
+      $this->assertSession()->pageTextContains('Help text: ' . $this->protectedNodesStructure[$key]['type']);
+      $this->assertSession()->pageTextContains($this->protectedNodesStructure[$key]['hint']);
+    }
+
+    // Test that it is possible to protect view modes other than the full one.
+    // The password form of all the nodes should be displayed in this teaser
+    // list.
+    $this->drupalGet(self::TEST_CONTROLLER_PATH);
+    foreach (array_keys($this->protectedNodes) as $key) {
+      $this->assertSession()->pageTextContains('Help text: ' . $this->protectedNodesStructure[$key]['type']);
+      $this->assertSession()->pageTextContains($this->protectedNodesStructure[$key]['hint']);
+    }
+  }
 
   /**
    * Test the hide title feature.

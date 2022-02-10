@@ -18,8 +18,8 @@ final class TestController extends ControllerBase {
    *   The render array that list the contents.
    */
   public function list(): array {
-    $node_storage = $this->entityTypeManager->getStorage('node');
-    $node_view_builder = $this->entityTypeManager->getViewBuilder('node');
+    $node_storage = $this->entityTypeManager()->getStorage('node');
+    $node_view_builder = $this->entityTypeManager()->getViewBuilder('node');
 
     $nodes = $node_storage->loadMultiple();
 
