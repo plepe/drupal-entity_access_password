@@ -124,6 +124,17 @@ class GlobalBehaviorsTest extends EntityAccessPasswordFunctionalTestBase {
       'node' => $node,
     ]);
     $this->assertEquals('Protected entity', $token_value);
+
+    // Test error message if the password is not correct.
+    $node = $this->protectedNodes['all'];
+    $this->drupalGet($node->toUrl());
+    // Enter a password different from global, bundle and entity password.
+    $this->submitForm(
+      ['form_password' => 'wrong'],
+      $this->t('Submit'),
+      'entity-access-password-password-node-' . $node->id()
+    );
+    $this->assertSession()->pageTextContains('Incorrect password!');
   }
 
 }
