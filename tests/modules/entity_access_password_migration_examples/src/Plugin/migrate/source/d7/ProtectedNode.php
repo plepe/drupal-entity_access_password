@@ -8,7 +8,7 @@ use Drupal\migrate\Row;
 use Drupal\node\Plugin\migrate\source\d7\Node;
 
 /**
- * Exemple source plugin for Protected Node custom table.
+ * Example source plugin for Protected Node custom table.
  *
  * @MigrateSource(
  *     id = "d7_entity_access_password_protected_node",

@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\entity_access_password\Functional;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Utility\Token;
 use Drupal\user\UserInterface;
 
@@ -13,6 +14,7 @@ use Drupal\user\UserInterface;
  * @group entity_access_password
  */
 class GlobalBehaviorsTest extends EntityAccessPasswordFunctionalTestBase {
+  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
@@ -23,6 +25,8 @@ class GlobalBehaviorsTest extends EntityAccessPasswordFunctionalTestBase {
 
   /**
    * The token service.
+   *
+   * @var \Drupal\Core\Utility\Token
    */
   protected Token $token;
 
@@ -56,6 +60,16 @@ class GlobalBehaviorsTest extends EntityAccessPasswordFunctionalTestBase {
    * Test that hint and help texts are displayed on the password form.
    */
   public function testGlobalBehaviors(): void {
+    // Test random password message.
+    $this->drupalLogin($this->adminUser);
+    $this->drupalGet('/node/add/eap_all');
+    $this->submitForm([
+      'title[0][value]' => $this->randomString(),
+      $this->fieldName . '[0][is_protected]' => TRUE,
+      $this->fieldName . '[0][protected_wrapper][change_existing_wrapper][random_password]' => TRUE,
+    ], $this->t('Save'));
+    $this->assertSession()->pageTextContains('Please note the randomly generated password as it will not be possible to show it again:');
+
     // Test that a password with bypass permission can access the content
     // directly, so no password form, hence no help and hint texts.
     $this->drupalLogin($this->bypassPasswordUser);
@@ -78,7 +92,7 @@ class GlobalBehaviorsTest extends EntityAccessPasswordFunctionalTestBase {
     // The password form of all the nodes should be displayed in this teaser
     // list.
     $this->drupalGet(self::TEST_CONTROLLER_PATH);
-    foreach (array_keys($this->protectedNodes) as $key) {
+    foreach (\array_keys($this->protectedNodes) as $key) {
       $this->assertSession()->pageTextContains('Help text: ' . $this->protectedNodesStructure[$key]['type']);
       $this->assertSession()->pageTextContains($this->protectedNodesStructure[$key]['hint']);
     }
@@ -86,10 +100,11 @@ class GlobalBehaviorsTest extends EntityAccessPasswordFunctionalTestBase {
     // Test the hide title feature.
     // Check a protected content showing the title.
     $node = $this->protectedNodes['all'];
+    /** @var string $node_title */
     $node_title = $node->label();
     $this->drupalGet($node->toUrl());
     // Page title.
-    $this->assertSession()->titleEquals("$node_title | Drupal");
+    $this->assertSession()->titleEquals("{$node_title} | Drupal");
     // Block page title.
     $this->assertSession()->elementContains('css', 'h1', $node_title);
     // Label in entity template.
@@ -115,12 +130,5 @@ class GlobalBehaviorsTest extends EntityAccessPasswordFunctionalTestBase {
     ]);
     $this->assertEquals('Protected entity', $token_value);
   }
-
-  /**
-   * Test random password message.
-   */
-//  public function testRandomPassword(): void {
-//
-//  }
 
 }

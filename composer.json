@@ -1,8 +1,8 @@
 {
     "name": "drupal/entity_access_password",
-    "type": "drupal-module",
     "description": "Allows protection of fieldable entities with a password.",
     "license": "GPL-2.0-or-later",
+    "type": "drupal-module",
     "require-dev": {
         "drupal/token": "~1.10"
     }

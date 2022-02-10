@@ -152,6 +152,7 @@ abstract class EntityAccessPasswordFunctionalTestBase extends BrowserTestBase {
 
     $this->createFieldStorage();
     $this->createFieldsConfig();
+    $this->configureFormModes();
     $this->configureViewModes();
     $this->setProtectedNodesStructure();
     $this->createTestContent();
@@ -255,9 +256,38 @@ abstract class EntityAccessPasswordFunctionalTestBase extends BrowserTestBase {
   }
 
   /**
+   * Configure the form modes.
+   *
+   * Display the password form on the password protected view mode. And hide it
+   * in the other view modes.
+   */
+  protected function configureFormModes(): void {
+    $bundles = [
+      'eap_global',
+      'eap_bundle',
+      'eap_entity',
+      'eap_all',
+    ];
+
+    foreach ($bundles as $bundle) {
+      $this->displayRepository->getFormDisplay('node', $bundle)
+        ->setComponent($this->fieldName, [
+          'type' => 'entity_access_password_password',
+          'settings' => [
+            'open' => FALSE,
+            'show_entity_title' => 'optional',
+            'show_hint' => 'optional',
+            'allow_random_password' => TRUE,
+          ],
+        ])
+        ->save();
+    }
+  }
+
+  /**
    * Configure the view modes.
    *
-   * Display the password form on the passwor dprotected view mode. And hide it
+   * Display the password form on the password protected view mode. And hide it
    * in the other view modes.
    */
   protected function configureViewModes(): void {
