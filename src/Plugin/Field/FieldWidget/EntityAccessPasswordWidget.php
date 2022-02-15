@@ -151,6 +151,7 @@ class EntityAccessPasswordWidget extends WidgetBase {
     // Show entity password only if enabled.
     if ($this->getFieldSetting('password_entity')) {
       $password_already_set = (isset($items[$delta]->password) && !empty($items[$delta]->password));
+      $form_state->set('password_already_set', $password_already_set);
       // Allows password confirm states to depend only on the random password
       // checkbox.
       $element['protected_wrapper'] = [
@@ -289,7 +290,7 @@ class EntityAccessPasswordWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state): array {
-    foreach ($values as &$value) {
+    foreach ($values as $delta => &$value) {
       // Entity password is not enabled.
       if (!isset($value['protected_wrapper'])) {
         continue;
@@ -316,6 +317,15 @@ class EntityAccessPasswordWidget extends WidgetBase {
       }
       elseif (!empty($password)) {
         $value['password'] = $this->password->hash($password);
+      }
+      // In case only entity password is enabled and password is empty.
+      elseif ($value['is_protected']
+        && !$this->getFieldSetting('password_bundle')
+        && !$this->getFieldSetting('password_global')
+        && !$form_state->get('password_already_set')
+      ) {
+        $field_name = $this->fieldDefinition->getName();
+        $form_state->setError($form[$field_name]['widget'][$delta]['protected_wrapper']['change_existing_wrapper']['password_confirm_wrapper']['password'], $this->t('A password needs to be set.'));
       }
 
       // Cleanup.
