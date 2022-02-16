@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Drupal\entity_access_password_migrate\Plugin\migrate\source;
+namespace Drupal\entity_access_password_migration_examples_lesson\Plugin\migrate\source;
 
 use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 

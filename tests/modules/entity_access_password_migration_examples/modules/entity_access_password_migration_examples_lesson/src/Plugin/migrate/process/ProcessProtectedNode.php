@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Drupal\entity_access_password_migrate\Plugin\migrate\process;
+namespace Drupal\entity_access_password_migration_examples_lesson\Plugin\migrate\process;
 
 use Drupal\Core\Database\Database;
 use Drupal\migrate\MigrateExecutableInterface;
