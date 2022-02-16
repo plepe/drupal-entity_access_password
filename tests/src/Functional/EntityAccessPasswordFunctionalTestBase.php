@@ -63,32 +63,11 @@ abstract class EntityAccessPasswordFunctionalTestBase extends BrowserTestBase {
   protected string $fieldName = 'field_eap';
 
   /**
-   * The list of admin user permissions.
-   *
-   * @var array
-   */
-  protected array $adminUserPermissions = [
-    'administer_entity_access_password',
-    'bypass_password_protection',
-    'bypass node access',
-    'access content',
-  ];
-
-  /**
    * The admin user.
    *
    * @var \Drupal\user\UserInterface
    */
   protected UserInterface $adminUser;
-
-  /**
-   * The list of user permissions.
-   *
-   * @var array
-   */
-  protected array $userPermissions = [
-    'access content',
-  ];
 
   /**
    * The test user.
@@ -159,8 +138,8 @@ abstract class EntityAccessPasswordFunctionalTestBase extends BrowserTestBase {
     $this->setProtectedNodesStructure();
     $this->createTestContent();
 
-    $this->user = $this->drupalCreateUser($this->userPermissions);
-    $this->adminUser = $this->drupalCreateUser($this->adminUserPermissions);
+    $this->user = $this->drupalCreateUser($this->getUserPermissions());
+    $this->adminUser = $this->drupalCreateUser($this->getAdminUserPermissions());
   }
 
   /**
@@ -486,6 +465,33 @@ abstract class EntityAccessPasswordFunctionalTestBase extends BrowserTestBase {
   protected function passwordFormIsNotDisplayed(string $key): void {
     $this->assertSession()->pageTextNotContains('Help text: ' . $this->protectedNodesStructure[$key]['type']);
     $this->assertSession()->pageTextNotContains($this->protectedNodesStructure[$key]['hint']);
+  }
+
+  /**
+   * The list of user permissions.
+   *
+   * @return array
+   *   The list of user permissions.
+   */
+  protected function getUserPermissions(): array {
+    return [
+      'access content',
+    ];
+  }
+
+  /**
+   * The list of admin user permissions.
+   *
+   * @return array
+   *   The list of admin user permissions.
+   */
+  protected function getAdminUserPermissions(): array {
+    return [
+      'administer_entity_access_password',
+      'bypass_password_protection',
+      'bypass node access',
+      'access content',
+    ];
   }
 
 }
