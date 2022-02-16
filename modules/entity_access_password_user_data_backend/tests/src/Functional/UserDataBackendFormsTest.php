@@ -74,7 +74,7 @@ class UserDataBackendFormsTest extends EntityAccessPasswordFunctionalTestBase {
    */
   public function testForms(): void {
     // To have the new routes found.
-    drupal_flush_all_caches();
+    \drupal_flush_all_caches();
 
     $this->drupalLogin($this->adminUser);
 
@@ -150,21 +150,27 @@ class UserDataBackendFormsTest extends EntityAccessPasswordFunctionalTestBase {
    *
    * @param string $accessLevel
    *   The level of access to check.
-   * @param \Drupal\user\UserInterface $user,
+   * @param \Drupal\user\UserInterface $user
    *   The user to check access for.
    * @param \Drupal\Core\Entity\FieldableEntityInterface|null $entity
    *   The entity to check access against. NULL if global access.
    */
   protected function userHasAccess(string $accessLevel, UserInterface $user, ?FieldableEntityInterface $entity = NULL): void {
-    $this->assertSession()->pageTextContains($user->getDisplayName());
-    $this->assertSession()->pageTextContains($user->getEmail());
+    /** @var string $username */
+    $username = $user->getDisplayName();
+    /** @var string $user_mail */
+    $user_mail = $user->getEmail();
+    $this->assertSession()->pageTextContains($username);
+    $this->assertSession()->pageTextContains($user_mail);
     $this->accountSwitcher->switchTo($user);
     switch ($accessLevel) {
       case 'entity':
+        // @phpstan-ignore-next-line
         $this->assertTrue($this->userDataBackend->hasUserAccessToEntity($entity));
         break;
 
       case 'bundle':
+        // @phpstan-ignore-next-line
         $this->assertTrue($this->userDataBackend->hasUserAccessToBundle($entity));
         break;
 
@@ -180,21 +186,27 @@ class UserDataBackendFormsTest extends EntityAccessPasswordFunctionalTestBase {
    *
    * @param string $accessType
    *   The type of access to check.
-   * @param \Drupal\user\UserInterface $user,
+   * @param \Drupal\user\UserInterface $user
    *   The user to check access for.
    * @param \Drupal\Core\Entity\FieldableEntityInterface|null $entity
    *   The entity to check access against.
    */
   protected function userDoesNotHaveAccess(string $accessType, UserInterface $user, ?FieldableEntityInterface $entity): void {
-    $this->assertSession()->pageTextNotContains($user->getDisplayName());
-    $this->assertSession()->pageTextNotContains($user->getEmail());
+    /** @var string $username */
+    $username = $user->getDisplayName();
+    /** @var string $user_mail */
+    $user_mail = $user->getEmail();
+    $this->assertSession()->pageTextNotContains($username);
+    $this->assertSession()->pageTextNotContains($user_mail);
     $this->accountSwitcher->switchTo($user);
     switch ($accessType) {
       case 'entity':
+        // @phpstan-ignore-next-line
         $this->assertFalse($this->userDataBackend->hasUserAccessToEntity($entity));
         break;
 
       case 'bundle':
+        // @phpstan-ignore-next-line
         $this->assertFalse($this->userDataBackend->hasUserAccessToBundle($entity));
         break;
 

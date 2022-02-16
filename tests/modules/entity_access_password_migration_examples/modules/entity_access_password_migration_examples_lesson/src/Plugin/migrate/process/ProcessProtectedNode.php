@@ -13,7 +13,7 @@ use Drupal\migrate\Row;
  * Process Protected Node.
  *
  * @MigrateProcessPlugin(
- *   id = "process_protected_node"
+ *     id = "process_protected_node"
  * )
  *
  * @code
@@ -34,7 +34,7 @@ class ProcessProtectedNode extends ProcessPluginBase {
     /** @var string $d7_nid */
     $d7_nid = $value;
 
-    if ($d7_nid && is_numeric($d7_nid)) {
+    if ($d7_nid && \is_numeric($d7_nid)) {
       // Get D7 Protected Node Entry.
       Database::setActiveConnection($this->configuration['migration_db_key']);
       $database = Database::getConnection();

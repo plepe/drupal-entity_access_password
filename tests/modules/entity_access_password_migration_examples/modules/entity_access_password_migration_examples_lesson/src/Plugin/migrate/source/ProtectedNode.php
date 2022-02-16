@@ -10,7 +10,7 @@ use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
  * Source plugin for protected_node migration.
  *
  * @MigrateSource(
- *   id = "protected_node"
+ *     id = "protected_node"
  * )
  */
 class ProtectedNode extends DrupalSqlBase {
@@ -41,12 +41,11 @@ class ProtectedNode extends DrupalSqlBase {
    * {@inheritdoc}
    */
   public function getIds() {
-    $ids = [
+    return [
       'nid' => [
         'type' => 'integer',
       ],
     ];
-    return $ids;
   }
 
   /**
