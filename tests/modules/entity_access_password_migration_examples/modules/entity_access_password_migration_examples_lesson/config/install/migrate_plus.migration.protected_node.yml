@@ -1,0 +1,31 @@
+id: protected_node
+label: 'Protected Node Bundle Migration'
+migration_group: 'Protected Node Bundle Migration'
+dependencies:
+  enforced:
+    module:
+      - entity_access_password_migration_examples_lesson
+source:
+  plugin: protected_node
+  # SqlBase source parameter, tell the plugin to execute query against the
+  # 'default' key.
+  key: migrate
+  target: default
+destination:
+  plugin: entity:node
+process:
+  nid:
+    plugin: migration_lookup
+    source: nid
+    # Replace node_lesson by your custom node migration name.
+    migration: node_lesson
+  # Replace field_password_protect by your custom field name.
+  field_password_protect:
+    plugin: process_protected_node
+    source: nid
+    # Replace migration_db_key by your custom migration DB key.
+    migration_db_key: 'migrate'
+    # Replace lesson by your custom node type.
+    bundle: 'lesson'
+    # Replace langcode by your custom langcode.
+    langcode: 'und'
