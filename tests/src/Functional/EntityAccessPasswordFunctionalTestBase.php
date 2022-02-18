@@ -77,6 +77,13 @@ abstract class EntityAccessPasswordFunctionalTestBase extends BrowserTestBase {
   protected UserInterface $user;
 
   /**
+   * The bypass password test user.
+   *
+   * @var \Drupal\user\UserInterface
+   */
+  protected UserInterface $bypassPasswordUser;
+
+  /**
    * The test nodes structure.
    *
    * @var array
@@ -138,8 +145,9 @@ abstract class EntityAccessPasswordFunctionalTestBase extends BrowserTestBase {
     $this->setProtectedNodesStructure();
     $this->createTestContent();
 
-    $this->user = $this->drupalCreateUser($this->getUserPermissions());
     $this->adminUser = $this->drupalCreateUser($this->getAdminUserPermissions());
+    $this->user = $this->drupalCreateUser($this->getUserPermissions());
+    $this->bypassPasswordUser = $this->drupalCreateUser($this->getBypassUserPermissions());
   }
 
   /**
@@ -159,7 +167,7 @@ abstract class EntityAccessPasswordFunctionalTestBase extends BrowserTestBase {
    * Create the field config.
    */
   protected function createFieldsConfig(): void {
-    $field_config = FieldConfig::create([
+    FieldConfig::create([
       'field_name' => $this->fieldName,
       'label' => 'Entity access password',
       'entity_type' => 'node',
@@ -175,10 +183,9 @@ abstract class EntityAccessPasswordFunctionalTestBase extends BrowserTestBase {
           'teaser' => 'teaser',
         ],
       ],
-    ]);
-    $field_config->save();
+    ])->save();
 
-    $field_config = FieldConfig::create([
+    FieldConfig::create([
       'field_name' => $this->fieldName,
       'label' => 'Entity access password',
       'entity_type' => 'node',
@@ -194,10 +201,9 @@ abstract class EntityAccessPasswordFunctionalTestBase extends BrowserTestBase {
           'teaser' => 'teaser',
         ],
       ],
-    ]);
-    $field_config->save();
+    ])->save();
 
-    $field_config = FieldConfig::create([
+    FieldConfig::create([
       'field_name' => $this->fieldName,
       'label' => 'Entity access password',
       'entity_type' => 'node',
@@ -213,10 +219,9 @@ abstract class EntityAccessPasswordFunctionalTestBase extends BrowserTestBase {
           'teaser' => 'teaser',
         ],
       ],
-    ]);
-    $field_config->save();
+    ])->save();
 
-    $field_config = FieldConfig::create([
+    FieldConfig::create([
       'field_name' => $this->fieldName,
       'label' => 'Entity access password',
       'entity_type' => 'node',
@@ -232,8 +237,7 @@ abstract class EntityAccessPasswordFunctionalTestBase extends BrowserTestBase {
           'teaser' => 'teaser',
         ],
       ],
-    ]);
-    $field_config->save();
+    ])->save();
   }
 
   /**
@@ -480,6 +484,18 @@ abstract class EntityAccessPasswordFunctionalTestBase extends BrowserTestBase {
   }
 
   /**
+   * The list of user permissions.
+   *
+   * @return array
+   *   The list of user permissions.
+   */
+  protected function getBypassUserPermissions(): array {
+    return [
+      'bypass_password_protection',
+    ] + $this->getUserPermissions();
+  }
+
+  /**
    * The list of admin user permissions.
    *
    * @return array
@@ -488,10 +504,8 @@ abstract class EntityAccessPasswordFunctionalTestBase extends BrowserTestBase {
   protected function getAdminUserPermissions(): array {
     return [
       'administer_entity_access_password',
-      'bypass_password_protection',
       'bypass node access',
-      'access content',
-    ];
+    ] + $this->getBypassUserPermissions();
   }
 
 }

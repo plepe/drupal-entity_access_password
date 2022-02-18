@@ -5,10 +5,9 @@ declare(strict_types = 1);
 namespace Drupal\Tests\entity_access_password\Functional;
 
 use Drupal\Core\Utility\Token;
-use Drupal\user\UserInterface;
 
 /**
- * Backend independent tests.
+ * Global behavior tests.
  *
  * @group entity_access_password
  */
@@ -29,19 +28,11 @@ class GlobalBehaviorsTest extends EntityAccessPasswordFunctionalTestBase {
   protected Token $token;
 
   /**
-   * The bypass password test user.
-   *
-   * @var \Drupal\user\UserInterface
-   */
-  protected UserInterface $bypassPasswordUser;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
     $this->token = $this->container->get('token');
-    $this->bypassPasswordUser = $this->drupalCreateUser($this->getBypassUserPermissions());
   }
 
   /**
@@ -125,19 +116,6 @@ class GlobalBehaviorsTest extends EntityAccessPasswordFunctionalTestBase {
       'entity-access-password-password-node-' . $node->id()
     );
     $this->assertSession()->pageTextContains('Incorrect password!');
-  }
-
-  /**
-   * The list of user permissions.
-   *
-   * @return array
-   *   The list of user permissions.
-   */
-  protected function getBypassUserPermissions(): array {
-    return [
-      'bypass_password_protection',
-      'access content',
-    ];
   }
 
 }

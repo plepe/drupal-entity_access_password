@@ -371,15 +371,15 @@ class UserDataBackendFormsTest extends EntityAccessPasswordFunctionalTestBase {
    */
   protected function getAdminUserPermissions(): array {
     return [
-        'entity_access_password_user_data_backend_access_entity_form',
-        'entity_access_password_user_data_backend_access_bundle_form',
-        'entity_access_password_user_data_backend_access_global_form',
-        'entity_access_password_user_data_backend_access_user_form',
-        'edit any eap_global content',
-        'edit any eap_bundle content',
-        'edit any eap_entity content',
-        'edit any eap_all content',
-      ] + parent::getAdminUserPermissions();
+      'entity_access_password_user_data_backend_access_entity_form',
+      'entity_access_password_user_data_backend_access_bundle_form',
+      'entity_access_password_user_data_backend_access_global_form',
+      'entity_access_password_user_data_backend_access_user_form',
+      'edit any eap_global content',
+      'edit any eap_bundle content',
+      'edit any eap_entity content',
+      'edit any eap_all content',
+    ] + parent::getAdminUserPermissions();
   }
 
 }
