@@ -95,6 +95,10 @@ class UserDataBackendFormsTest extends EntityAccessPasswordFunctionalTestBase {
     $this->checkAccessLevelForm('global');
 
     // User form.
+    $this->drupalGet(Url::fromRoute('entity_access_password_user_data_backend.user_data_form.user', [
+      'user' => $this->user->id(),
+    ]));
+    $this->checkUserForm($this->user);
   }
 
   /**
@@ -143,6 +147,151 @@ class UserDataBackendFormsTest extends EntityAccessPasswordFunctionalTestBase {
     );
     $this->userDoesNotHaveAccess($accessLevel, $this->user, $entity);
     $this->userDoesNotHaveAccess($accessLevel, $this->user2, $entity);
+  }
+
+  /**
+   * Test the user form.
+   *
+   * @param \Drupal\user\UserInterface $user
+   *   The user to check access for.
+   */
+  protected function checkUserForm(UserInterface $user): void {
+    // Test global access.
+    $this->accountSwitcher->switchTo($user);
+    $this->assertFalse($this->userDataBackend->hasUserGlobalAccess());
+    $this->accountSwitcher->switchBack();
+    $this->submitForm(
+      ['user_has_global_access' => TRUE],
+      $this->t('Submit')
+    );
+    $this->accountSwitcher->switchTo($user);
+    $this->assertTrue($this->userDataBackend->hasUserGlobalAccess());
+    $this->accountSwitcher->switchBack();
+
+    $this->submitForm(
+      ['user_has_global_access' => FALSE],
+      $this->t('Submit')
+    );
+    $this->accountSwitcher->switchTo($user);
+    $this->assertFalse($this->userDataBackend->hasUserGlobalAccess());
+    $this->accountSwitcher->switchBack();
+
+    // Test bundle access.
+    $bundles = [
+      'eap_global' => [
+        'node_key' => 'global',
+        'bundle_label' => 'Global password',
+      ],
+      'eap_bundle' => [
+        'node_key' => 'bundle',
+        'bundle_label' => 'Bundle password',
+      ],
+      'eap_entity' => [
+        'node_key' => 'entity',
+        'bundle_label' => 'Entity password',
+      ],
+      'eap_all' => [
+        'node_key' => 'all',
+        'bundle_label' => 'All password levels',
+      ],
+    ];
+
+    // Grant access to bundles.
+    $bundles_submit_infos = [];
+    $this->accountSwitcher->switchTo($user);
+    foreach ($bundles as $bundle => $bundle_infos) {
+      $this->assertSession()->pageTextContains('Content: ' . $bundle_infos['bundle_label']);
+      $this->assertFalse($this->userDataBackend->hasUserAccessToBundle($this->protectedNodes[$bundle_infos['node_key']]));
+      $bundles_submit_infos["bundles[node||{$bundle}]"] = TRUE;
+    }
+    $this->accountSwitcher->switchBack();
+
+    $this->submitForm(
+      $bundles_submit_infos,
+      $this->t('Submit')
+    );
+
+    // Revoke access.
+    $bundles_submit_infos = [];
+    $this->accountSwitcher->switchTo($user);
+    foreach ($bundles as $bundle => $bundle_infos) {
+      $this->assertTrue($this->userDataBackend->hasUserAccessToBundle($this->protectedNodes[$bundle_infos['node_key']]));
+      $bundles_submit_infos["bundles[node||{$bundle}]"] = FALSE;
+    }
+    $this->accountSwitcher->switchBack();
+
+    $this->submitForm(
+      $bundles_submit_infos,
+      $this->t('Submit')
+    );
+    $this->accountSwitcher->switchTo($user);
+    foreach ($bundles as $bundle_infos) {
+      $this->assertFalse($this->userDataBackend->hasUserAccessToBundle($this->protectedNodes[$bundle_infos['node_key']]));
+    }
+    $this->accountSwitcher->switchBack();
+
+    // Test entity access.
+    // Non existing entity.
+    $this->submitForm(
+      ['entity_grant_area' => 'node:123456'],
+      $this->t('Submit')
+    );
+    $this->assertSession()->pageTextContains('No entities found for the type node and the ID 123456.');
+
+    // Grant access to entities.
+    $entities_submit_infos = [];
+    $this->accountSwitcher->switchTo($user);
+    foreach ($this->protectedNodes as $protectedNode) {
+      $this->assertSession()->pageTextNotContains(': ' . $protectedNode->label());
+      $this->assertFalse($this->userDataBackend->hasUserAccessToEntity($protectedNode));
+      $entities_submit_infos[] = 'node:' . $protectedNode->id();
+    }
+    $this->accountSwitcher->switchBack();
+
+    $this->submitForm(
+      ['entity_grant_area' => \implode(',', $entities_submit_infos)],
+      $this->t('Submit')
+    );
+
+    $this->accountSwitcher->switchTo($user);
+    foreach ($this->protectedNodes as $protectedNode) {
+      $this->assertSession()->pageTextContains(': ' . $protectedNode->label());
+      $this->assertTrue($this->userDataBackend->hasUserAccessToEntity($protectedNode));
+    }
+    $this->accountSwitcher->switchBack();
+
+    // Revoke all.
+    $this->submitForm(
+      ['entity_revoke_all' => TRUE],
+      $this->t('Submit')
+    );
+
+    $this->accountSwitcher->switchTo($user);
+    foreach ($this->protectedNodes as $protectedNode) {
+      $this->assertSession()->pageTextNotContains(': ' . $protectedNode->label());
+      $this->assertFalse($this->userDataBackend->hasUserAccessToEntity($protectedNode));
+    }
+    $this->accountSwitcher->switchBack();
+
+    // Revoke access to one entity (grant access first).
+    $protected_node = $this->protectedNodes['entity'];
+    $this->submitForm(
+      ['entity_grant_area' => 'node:' . $protected_node->id()],
+      $this->t('Submit')
+    );
+    $this->accountSwitcher->switchTo($user);
+    $this->assertSession()->pageTextContains(': ' . $protected_node->label());
+    $this->assertTrue($this->userDataBackend->hasUserAccessToEntity($protected_node));
+    $this->accountSwitcher->switchBack();
+
+    $this->submitForm(
+      ['entities[node||' . $protected_node->uuid() . ']' => TRUE],
+      $this->t('Submit')
+    );
+    $this->accountSwitcher->switchTo($user);
+    $this->assertSession()->pageTextNotContains(': ' . $protected_node->label());
+    $this->assertFalse($this->userDataBackend->hasUserAccessToEntity($protected_node));
+    $this->accountSwitcher->switchBack();
   }
 
   /**
@@ -222,15 +371,15 @@ class UserDataBackendFormsTest extends EntityAccessPasswordFunctionalTestBase {
    */
   protected function getAdminUserPermissions(): array {
     return [
-      'entity_access_password_user_data_backend_access_entity_form',
-      'entity_access_password_user_data_backend_access_bundle_form',
-      'entity_access_password_user_data_backend_access_global_form',
-      'entity_access_password_user_data_backend_access_user_form',
-      'edit any eap_global content',
-      'edit any eap_bundle content',
-      'edit any eap_entity content',
-      'edit any eap_all content',
-    ] + parent::getAdminUserPermissions();
+        'entity_access_password_user_data_backend_access_entity_form',
+        'entity_access_password_user_data_backend_access_bundle_form',
+        'entity_access_password_user_data_backend_access_global_form',
+        'entity_access_password_user_data_backend_access_user_form',
+        'edit any eap_global content',
+        'edit any eap_bundle content',
+        'edit any eap_entity content',
+        'edit any eap_all content',
+      ] + parent::getAdminUserPermissions();
   }
 
 }
