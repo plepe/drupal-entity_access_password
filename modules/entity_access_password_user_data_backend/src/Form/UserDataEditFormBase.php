@@ -130,6 +130,7 @@ abstract class UserDataEditFormBase extends FormBase {
       }
 
       $grant_user_ids = $user_storage->getQuery('OR')
+        ->accessCheck(FALSE)
         ->condition('name', $user_name_or_email)
         ->condition('mail', $user_name_or_email)
         ->execute();

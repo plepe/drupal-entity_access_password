@@ -210,6 +210,7 @@ class UserUserDataEditForm extends FormBase {
       $entity_storage = $this->entityTypeManager->getStorage($entity_type_id);
       /** @var array $entity_ids */
       $entity_ids = $entity_storage->getQuery()
+        ->accessCheck(FALSE)
         ->condition('uuid', $entity_uuids, 'IN')
         ->execute();
 
