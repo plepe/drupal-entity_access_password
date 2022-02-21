@@ -4,6 +4,7 @@
     "license": "GPL-2.0-or-later",
     "type": "drupal-module",
     "require-dev": {
-        "drupal/token": "~1.10"
+        "drupal/token": "~1.10",
+        "drupal/webform": "~6.1"
     }
 }
