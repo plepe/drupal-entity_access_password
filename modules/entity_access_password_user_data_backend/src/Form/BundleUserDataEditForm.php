@@ -4,10 +4,19 @@ declare(strict_types = 1);
 
 namespace Drupal\entity_access_password_user_data_backend\Form;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+
 /**
  * Provides form to remove access (stored in user data) to the bundle.
  */
 class BundleUserDataEditForm extends UserDataEditFormBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getFormTitle(): TranslatableMarkup {
+    return $this->t('Bundle password user data');
+  }
 
   /**
    * {@inheritdoc}

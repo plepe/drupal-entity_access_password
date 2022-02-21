@@ -65,9 +65,6 @@ class BundleFormRoutes implements ContainerInjectionInterface {
         $route = new Route("/admin/config/content/entity_access_password/user_data/{$entity_type_id}/{$bundle_id}");
         $route
           ->addDefaults([
-            // @todo check if this is translatable and if possible to inject
-            // variables.
-            '_title' => 'Bundle password user data',
             '_form' => '\Drupal\entity_access_password_user_data_backend\Form\BundleUserDataEditForm',
           ])
           ->addRequirements([

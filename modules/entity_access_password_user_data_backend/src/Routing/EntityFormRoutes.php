@@ -66,9 +66,6 @@ class EntityFormRoutes implements ContainerInjectionInterface {
         $route = new Route("/entity_access_password_user_data_backend/{$entity_type_id}/{$bundle_id}/{{$entity_type_id}}");
         $route
           ->addDefaults([
-            // @todo check if this is translatable and if possible to inject
-            // variables.
-            '_title' => 'Entity password user data',
             '_form' => '\Drupal\entity_access_password_user_data_backend\Form\EntityUserDataEditForm',
           ])
           ->addRequirements([

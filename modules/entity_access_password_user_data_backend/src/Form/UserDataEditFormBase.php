@@ -7,6 +7,7 @@ namespace Drupal\entity_access_password_user_data_backend\Form;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\entity_access_password_user_data_backend\Service\UserDataBackendInterface;
 use Drupal\user\UserDataInterface;
 use Drupal\user\UserInterface;
@@ -67,6 +68,8 @@ abstract class UserDataEditFormBase extends FormBase {
       return [];
     }
     $form_state->addBuildInfo('user_data_name', $name);
+
+    $form['#title'] = $this->getFormTitle();
 
     $form['users'] = [
       '#type' => 'checkboxes',
@@ -154,6 +157,14 @@ abstract class UserDataEditFormBase extends FormBase {
    *   The user data name. Empty string if not possible to determine one.
    */
   abstract protected function getUserDataName(): string;
+
+  /**
+   * Retrieve the form title.
+   *
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   *   The form title. To have it translatable.
+   */
+  abstract protected function getFormTitle(): TranslatableMarkup;
 
   /**
    * Get the options.

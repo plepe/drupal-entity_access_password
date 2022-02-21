@@ -6,11 +6,19 @@ namespace Drupal\entity_access_password_user_data_backend\Form;
 
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Provides form to remove access (stored in user data) to the entity.
  */
 class EntityUserDataEditForm extends UserDataEditFormBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getFormTitle(): TranslatableMarkup {
+    return $this->t('Entity password user data');
+  }
 
   /**
    * {@inheritdoc}
