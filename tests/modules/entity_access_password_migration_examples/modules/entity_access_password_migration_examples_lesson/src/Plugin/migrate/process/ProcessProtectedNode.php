@@ -41,14 +41,17 @@ class ProcessProtectedNode extends ProcessPluginBase {
       $query = $database->select('protected_nodes', 'pn');
       $query->fields('pn');
       $query->condition('pn.nid', $d7_nid, '=');
-      /** @var \Drupal\Core\Database\StatementInterface $query */
-      $query->execute();
+      $query = $query->execute();
 
       if ($query == NULL) {
         return [];
       }
 
       $protected_node_row = $query->fetch();
+
+      if ($protected_node_row && $protected_node_row->protected_node_hint == NULL) {
+        $protected_node_row->protected_node_hint = '';
+      }
 
       if ($protected_node_row->protected_node_is_protected) {
         // Set D8 Password field values.
