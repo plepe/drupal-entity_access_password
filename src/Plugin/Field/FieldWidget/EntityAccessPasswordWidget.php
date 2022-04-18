@@ -144,14 +144,18 @@ class EntityAccessPasswordWidget extends WidgetBase {
     $element['is_protected'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Enable password protection'),
-      '#default_value' => $items[$delta]->is_protected ?? $element['#required'] ?? FALSE,
+      // @phpstan-ignore-next-line
+      '#default_value' => $item->is_protected ?? $element['#required'] ?? FALSE,
       '#required' => $element['#required'],
     ];
 
     // Show entity password only if enabled.
     if ($this->getFieldSetting('password_entity')) {
-      $password_already_set = (isset($items[$delta]->password) && !empty($items[$delta]->password));
-      $form_state->set('password_already_set', $password_already_set);
+      $existing_password = FALSE;
+      if (isset($item->password) && !empty($item->password)) {
+        $existing_password = $item->password;
+      }
+      $form_state->set('existing_password', $existing_password);
       // Allows password confirm states to depend only on the random password
       // checkbox.
       $element['protected_wrapper'] = [
@@ -165,7 +169,7 @@ class EntityAccessPasswordWidget extends WidgetBase {
         ],
       ];
 
-      if ($password_already_set) {
+      if ($existing_password) {
         $element['protected_wrapper']['change_existing'] = [
           '#type' => 'checkbox',
           '#title' => $this->t('Update existing password'),
@@ -187,7 +191,7 @@ class EntityAccessPasswordWidget extends WidgetBase {
       if ($this->getSetting('allow_random_password')) {
         $element['protected_wrapper']['change_existing_wrapper']['random_password'] = [
           '#type' => 'checkbox',
-          '#title' => $password_already_set ? $this->t('Generate random password (will replace the existing password)') : $this->t('Generate random password'),
+          '#title' => $existing_password ? $this->t('Generate random password (will replace the existing password)') : $this->t('Generate random password'),
           '#default_value' => FALSE,
         ];
       }
@@ -208,7 +212,7 @@ class EntityAccessPasswordWidget extends WidgetBase {
         '#type' => 'password_confirm',
       ];
 
-      if ($password_already_set) {
+      if ($existing_password) {
         $element['protected_wrapper']['change_existing_wrapper']['password_confirm_wrapper']['password']['#description'] = $this->t('If left empty will not overwrite the current password.');
         $element['protected_wrapper']['change_existing_wrapper']['password_confirm_wrapper']['password']['#after_build'][] = [
           static::class,
@@ -230,7 +234,8 @@ class EntityAccessPasswordWidget extends WidgetBase {
         $element['show_title'] = [
           '#type' => 'checkbox',
           '#title' => $this->t('Show entity title'),
-          '#default_value' => $items[$delta]->show_title ?? FALSE,
+          // @phpstan-ignore-next-line
+          '#default_value' => $item->show_title ?? FALSE,
           '#states' => [
             'invisible' => [
               ':input[name="' . $states_selector . '[' . $delta . '][is_protected]"]' => [
@@ -260,7 +265,8 @@ class EntityAccessPasswordWidget extends WidgetBase {
       $element['hint'] = [
         '#type' => 'textarea',
         '#title' => $this->t('Password hint'),
-        '#default_value' => $items[$delta]->hint ?? '',
+        // @phpstan-ignore-next-line
+        '#default_value' => $item->hint ?? '',
         '#required' => ($element['#required'] && $show_hint_setting === 'always'),
         '#states' => [
           'invisible' => [
@@ -297,6 +303,7 @@ class EntityAccessPasswordWidget extends WidgetBase {
       }
 
       $password = $value['protected_wrapper']['change_existing_wrapper']['password_confirm_wrapper']['password'];
+      $existing_password = $form_state->get('existing_password');
 
       // Random password.
       if (isset($value['protected_wrapper']['change_existing_wrapper']['random_password']) && $value['protected_wrapper']['change_existing_wrapper']['random_password']) {
@@ -318,11 +325,15 @@ class EntityAccessPasswordWidget extends WidgetBase {
       elseif (!empty($password)) {
         $value['password'] = $this->password->hash($password);
       }
+      // In case a password is set as default value in the field instance
+      // settings.
+      elseif ($existing_password) {
+        $value['password'] = $existing_password;
+      }
       // In case only entity password is enabled and password is empty.
       elseif ($value['is_protected']
         && !$this->getFieldSetting('password_bundle')
         && !$this->getFieldSetting('password_global')
-        && !$form_state->get('password_already_set')
       ) {
         $field_name = $this->fieldDefinition->getName();
         $form_state->setError($form[$field_name]['widget'][$delta]['protected_wrapper']['change_existing_wrapper']['password_confirm_wrapper']['password'], $this->t('A password needs to be set.'));
