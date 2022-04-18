@@ -336,7 +336,9 @@ class EntityAccessPasswordWidget extends WidgetBase {
         && !$this->getFieldSetting('password_global')
       ) {
         $field_name = $this->fieldDefinition->getName();
-        $form_state->setError($form[$field_name]['widget'][$delta]['protected_wrapper']['change_existing_wrapper']['password_confirm_wrapper']['password'], $this->t('A password needs to be set.'));
+        if (isset($form[$field_name]['widget'][$delta]['protected_wrapper']['change_existing_wrapper']['password_confirm_wrapper']['password'])) {
+          $form_state->setError($form[$field_name]['widget'][$delta]['protected_wrapper']['change_existing_wrapper']['password_confirm_wrapper']['password'], $this->t('A password needs to be set.'));
+        }
       }
 
       // Cleanup.
