@@ -490,9 +490,9 @@ abstract class EntityAccessPasswordFunctionalTestBase extends BrowserTestBase {
    *   The list of user permissions.
    */
   protected function getBypassUserPermissions(): array {
-    return [
+    return \array_merge([
       'bypass_password_protection',
-    ] + $this->getUserPermissions();
+    ], $this->getUserPermissions());
   }
 
   /**
@@ -502,10 +502,10 @@ abstract class EntityAccessPasswordFunctionalTestBase extends BrowserTestBase {
    *   The list of admin user permissions.
    */
   protected function getAdminUserPermissions(): array {
-    return [
+    return \array_merge([
       'administer_entity_access_password',
       'bypass node access',
-    ] + $this->getBypassUserPermissions();
+    ], $this->getBypassUserPermissions());
   }
 
 }

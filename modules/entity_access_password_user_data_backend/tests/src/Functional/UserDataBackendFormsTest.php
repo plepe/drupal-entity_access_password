@@ -370,7 +370,7 @@ class UserDataBackendFormsTest extends EntityAccessPasswordFunctionalTestBase {
    * {@inheritdoc}
    */
   protected function getAdminUserPermissions(): array {
-    return [
+    return \array_merge([
       'entity_access_password_user_data_backend_access_entity_form',
       'entity_access_password_user_data_backend_access_bundle_form',
       'entity_access_password_user_data_backend_access_global_form',
@@ -379,7 +379,7 @@ class UserDataBackendFormsTest extends EntityAccessPasswordFunctionalTestBase {
       'edit any eap_bundle content',
       'edit any eap_entity content',
       'edit any eap_all content',
-    ] + parent::getAdminUserPermissions();
+    ], parent::getAdminUserPermissions());
   }
 
 }
