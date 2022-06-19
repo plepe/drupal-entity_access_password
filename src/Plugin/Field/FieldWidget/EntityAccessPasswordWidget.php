@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\entity_access_password\Plugin\Field\FieldWidget;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -417,9 +418,18 @@ class EntityAccessPasswordWidget extends WidgetBase {
    */
   public static function passwordConfirmExistingPassword(array $element, FormStateInterface $form_state): array {
     $element['pass1']['#title'] = $element['pass1']['#title'] . ' (' . \t('a password is already set') . ')';
-    $element['pass1']['#attributes'] = [
+    $new_attributes = [
       'placeholder' => '********',
     ];
+    if (isset($element['pass1']['#attributes'])) {
+      $element['pass1']['#attributes'] = NestedArray::mergeDeepArray([
+        $element['pass1']['#attributes'],
+        $new_attributes,
+      ]);
+    }
+    else {
+      $element['pass1']['#attributes'] = $new_attributes;
+    }
     return $element;
   }
 
