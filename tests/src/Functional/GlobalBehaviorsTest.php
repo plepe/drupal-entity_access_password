@@ -16,7 +16,7 @@ class GlobalBehaviorsTest extends EntityAccessPasswordFunctionalTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'token',
   ];
 

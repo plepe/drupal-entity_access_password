@@ -49,7 +49,7 @@ abstract class EntityAccessPasswordFunctionalTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'entity_access_password',
     'entity_access_password_tests',
     'node',

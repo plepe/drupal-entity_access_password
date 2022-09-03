@@ -18,7 +18,7 @@ class SessionBackendTest extends BackendTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'entity_access_password_session_backend',
   ];
 

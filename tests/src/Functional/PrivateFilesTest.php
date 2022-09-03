@@ -20,7 +20,7 @@ class PrivateFilesTest extends EntityAccessPasswordFunctionalTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'file',
     'entity_access_password_session_backend',
   ];

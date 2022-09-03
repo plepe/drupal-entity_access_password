@@ -34,7 +34,7 @@ class UserDataBackendTest extends BackendTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'entity_access_password_user_data_backend',
   ];
 
