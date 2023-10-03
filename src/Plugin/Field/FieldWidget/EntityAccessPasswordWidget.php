@@ -55,6 +55,7 @@ class EntityAccessPasswordWidget extends WidgetBase {
   public static function defaultSettings(): array {
     return [
       'open' => FALSE,
+      'show_advanced' => TRUE,
       'show_entity_title' => 'optional',
       'show_hint' => 'optional',
       'allow_random_password' => FALSE,
@@ -72,6 +73,13 @@ class EntityAccessPasswordWidget extends WidgetBase {
       '#title' => $this->t('Show widget details as opened by default'),
       '#description' => $this->t('If checked, the fieldset that wraps the Entity Access Password field will initially be displayed expanded.'),
       '#default_value' => $this->getSetting('open'),
+    ];
+
+    $element['show_advanced'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Show widget in the advanced sidebar'),
+      '#description' => $this->t('If checked, the fieldset that wraps the Entity Access Password field will be shown in the advanced sidebar.'),
+      '#default_value' => $this->getSetting('show_advanced') ?? TRUE,
     ];
 
     $element['show_entity_title'] = [
@@ -284,7 +292,7 @@ class EntityAccessPasswordWidget extends WidgetBase {
       '#open' => $this->getSetting('open'),
     ];
     // Put the form element into the form's "advanced" group if on a node.
-    if ($item->getFieldDefinition()->getTargetEntityTypeId() == 'node') {
+    if ($this->getSetting('show_advanced')) {
       $element += [
         '#group' => 'advanced',
       ];
